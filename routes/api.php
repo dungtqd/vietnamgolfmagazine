@@ -17,3 +17,15 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+//program
+//Route::post('/program/create', 'ProgramController@store');
+//Route::put('/program/update/{id}', 'ProgramController@update');
+//Route::patch('/program/update/{id}', 'ProgramController@update');
+Route::get('/program/get-by-id/{id}', 'ProgramController@show');
+Route::get('/program/all', 'ProgramController@index');
+Route::get('/program/get-root-program/{id}', 'ProgramController@getRootProgram');
+
+
+//vote
+Route::get('/vote/count-total', 'VoteController@countTotalVote');

@@ -74,7 +74,7 @@ class AVoteController extends AdminController
      */
     protected function form()
     {
-        $programOptions = (new UtilsCommonHelper)->getAllPrograms();
+        $programOptions = (new UtilsCommonHelper)->getAllPrograms(); //TODO: check ko cho chon product co parent_id=0
         $programDefault = $programOptions->keys()->first();
 
         $productOptions = (new UtilsCommonHelper)->getAllProducts();
