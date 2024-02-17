@@ -405,6 +405,37 @@ return [
     |
     */
     'extensions' => [
+        'custom-actions-button' => [
+            "enable" => true,
 
+            "view" => [
+                "label" => "Detail",
+                "icon"  => "fa fa-eye",
+                "class" => "btn btn-sm btn-info"
+            ],
+
+            "edit" => [
+                "label" => "Edit",
+                "icon"  => "fa fa-edit",
+                "class" => "btn btn-sm btn-warning"
+            ],
+
+            "delete" => [
+                "label" => "",
+                "icon"  => "fa fa-trash",
+                "class" => "btn btn-sm btn-danger"
+            ]
+
+        ],
+        'ckeditor' => [
+
+            //Set to false if you want to disable this extension
+            'enable' => true,
+
+            // Editor configuration
+            'config' => [
+
+            ]
+        ]
     ],
 ];
