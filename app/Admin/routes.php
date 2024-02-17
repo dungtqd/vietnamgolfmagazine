@@ -26,5 +26,6 @@ Route::group([
     $router->resource('/module', AModuleController::class);
     $router->resource('/module-detail', AModuleDetailController::class);
     $router->resource('/config-seo', AConfigSeoController::class);
+    $router->resource('/vote', AVoteController::class);
 
 });
