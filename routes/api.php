@@ -29,8 +29,15 @@ Route::post('/program/get-detail-root-program', 'ProgramController@getDetailRoot
 Route::post('/program/get-children-program', 'ProgramController@getChildrenProgram');
 Route::post('/program/get-detail-children-program', 'ProgramController@getDetailChildProgram');
 
+//product
+Route::post('/product/get-rank-by-program', 'ProductController@getRankByProgram');
+Route::post('/product/get-all-by-program', 'ProductController@getAllByProgram');
+Route::post('/product/get-detail-by-id-and-program', 'ProductController@getDetailByIdAndProgram');
 
 //vote
 Route::get('/vote/count-total', 'VoteController@countTotalVote');
+Route::post('/vote/create', 'VoteController@store');
+Route::post('/vote/count-by-program', 'VoteController@countVoteByProgram');
+Route::post('/vote/count-by-program-and-product', 'VoteController@countVoteByProgramAndProduct');
 //banner
 Route::get('/banner/get-root-banner/{languageId}', 'BannerController@getAll');

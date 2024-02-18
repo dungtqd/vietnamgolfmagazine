@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\AlertModel;
+use App\Models\dto\ProductDto;
 use App\Models\ZoneModel;
 use App\Traits\ResponseFormattingTrait;
+use App\Util\Constant;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -107,38 +110,142 @@ class ProductController extends Controller
         return response()->json($response);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function getByUser($id)
+    public function getRankByProgram(Request $request): JsonResponse
     {
-        $alert = DB::table('alerts as p')
+        $request->validate([
+            'programId' => 'required|integer',
+            'languageId' => 'required|integer',
+        ]);
+
+
+        $programId = $request->input('programId');
+        $languageId = $request->input('languageId');
+
+        //get list children program
+        $childrenProduct = DB::table('product as p')
             ->select('p.id',
-                'p.name AS alertName',
-                'p.description AS alertDescription',
-                'p.zone_id AS zone_id',
-                'zo.name AS zoneName',
-                'zo.lat AS lat',
-                'zo.long AS `long`',
-                'zo.status AS zoneStatus',
-                'zo.alert AS zoneAlert',
-                'us.name AS `userName`',
-                'us2.name AS `friendName`',
-                'p.happened_at')
-            ->join('users as us', 'us.id', '=', 'p.user_id')
-            ->join('zones as zo', 'zo.id', '=', 'p.zone_id')
-            ->join('users as us2', 'us2.id', '=', 'p.friend_id')
-            ->where('p.user_id', '=', $id)
-//            ->whereIn('ca.name', array_column($filters, 'value'))
-            ->orderBy('p.happened_at', 'DESC')
-//            ->take($perPage)
+                'p.name',
+                'p.description',
+                'p.language_id',
+                'la.name',
+                'p.image')
+            ->join('program_product as pp', 'p.id', '=', 'pp.product_id')
+            ->join('language as la', 'la.id', '=', 'p.language_id')
+            ->where('pp.program_id', '=', $programId)
+            ->where('p.language_id', '=', $languageId)
+            ->orderBy('p.updated_at', 'DESC')
             ->get();
 
-        $total = $alert->count();
-        $response = $this->_formatBaseResponseWithTotal(200, $alert, $total, 'Lấy dữ liệu thành công');
+        $totalProgram = $childrenProduct->count();
+
+
+        $rootProductDto = [];
+        foreach ($childrenProduct as $childrenProduct) {
+            //count total vote
+            $totalVote = $this->countVoteByProgramAndProduct($programId, $childrenProduct->id, $languageId);
+            $rootProductDto[] = new ProductDto($childrenProduct, $totalVote);
+        }
+
+        //sort
+        $collection = collect($rootProductDto);
+        $sortedCollection = $collection->sortByDesc('totalVote');
+
+        $response = $this->_formatBaseResponseWithTotal(200, $sortedCollection, $totalProgram, 'Lấy dữ liệu thành công');
+
+        return response()->json($response);
+    }
+
+    private function countVoteByProgramAndProduct($programId, $productId, $languageId): int
+    {
+        $vote = DB::table('vote as vo')
+            ->select('vo.id')
+            ->where('vo.program_id', '=', $programId)
+            ->where('vo.product_id', '=', $productId)
+            ->where('vo.status', '=', Constant::VOTE_STATUS__VALID)
+            ->get();
+        return $vote->count();
+    }
+
+    public function getAllByProgram(Request $request): JsonResponse
+    {
+        $request->validate([
+            'programId' => 'required|integer',
+            'languageId' => 'required|integer',
+            'productName' => 'nullable|string',
+        ]);
+
+        $perPage = $request->input('limit', 16);
+
+        $programId = $request->input('programId');
+        $languageId = $request->input('languageId');
+        $productName = $request->input('productName');
+
+        //get list children program
+        if (is_null($productName)) {
+            $childrenProduct = DB::table('product as p')
+                ->select('p.id',
+                    'p.name',
+                    'p.language_id',
+                    'p.description')
+                ->join('program_product as pp', 'p.id', '=', 'pp.product_id')
+                ->join('program as po', 'po.id', '=', 'pp.program_id')
+                ->where('po.id', '=', $programId)
+                ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
+                ->where('p.language_id', '=', $languageId)
+                ->orderBy('pp.order', 'ASC')
+                ->limit($perPage)
+                ->get();
+        } else {
+            $childrenProduct = DB::table('product as p')
+                ->select('p.id',
+                    'p.name',
+                    'p.language_id',
+                    'p.description')
+                ->join('program_product as pp', 'p.id', '=', 'pp.product_id')
+                ->join('program as po', 'po.id', '=', 'pp.program_id')
+                ->where('po.id', '=', $programId)
+                ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
+                ->where('p.name', 'like', '%' . $productName . '%')
+                ->where('p.language_id', '=', $languageId)
+                ->orderBy('pp.order', 'ASC')
+                ->limit($perPage)
+                ->get();
+        }
+
+        $totalProgram = $childrenProduct->count();
+
+        $response = $this->_formatBaseResponseWithTotal(200, $childrenProduct, $totalProgram, 'Lấy dữ liệu thành công');
+
+        return response()->json($response);
+    }
+
+    public function getDetailByIdAndProgram(Request $request): JsonResponse
+    {
+        $request->validate([
+            'programId' => 'required|integer',
+            'languageId' => 'required|integer',
+            'productId' => 'required|integer',
+        ]);
+
+        $programId = $request->input('programId');
+        $languageId = $request->input('languageId');
+        $productId = $request->input('productId');
+
+        $childrenProduct = DB::table('product as p')
+            ->select('p.id',
+                'p.name',
+                'p.language_id',
+                'p.description')
+            ->join('program_product as pp', 'p.id', '=', 'pp.product_id')
+            ->join('program as po', 'po.id', '=', 'pp.program_id')
+            ->where('po.id', '=', $programId)
+            ->where('p.id', '=', $productId)
+            ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
+            ->where('p.language_id', '=', $languageId)
+            ->orderBy('pp.order', 'ASC')
+            ->get();
+
+        $response = $this->_formatBaseResponse(200, $childrenProduct, 'Lấy dữ liệu thành công');
 
         return response()->json($response);
     }
