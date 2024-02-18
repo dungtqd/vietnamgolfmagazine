@@ -2,7 +2,7 @@
 
 namespace App\Models\dto;
 
-class RootProgramDto
+class ProgramDto
 {
     public $program;
     public $totalVote;

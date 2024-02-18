@@ -25,7 +25,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/program/get-by-id/{id}', 'ProgramController@show');
 Route::get('/program/all', 'ProgramController@index');
 Route::get('/program/get-root-program/{id}', 'ProgramController@getRootProgram');
+Route::post('/program/get-detail-root-program', 'ProgramController@getDetailRootProgram');
+Route::post('/program/get-children-program', 'ProgramController@getChildrenProgram');
+Route::post('/program/get-detail-children-program', 'ProgramController@getDetailChildProgram');
 
 
 //vote
 Route::get('/vote/count-total', 'VoteController@countTotalVote');
+//banner
+Route::get('/banner/get-root-banner/{languageId}', 'BannerController@getAll');

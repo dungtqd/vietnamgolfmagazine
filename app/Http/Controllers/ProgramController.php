@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\dto\RootProgramDto;
+use App\Models\dto\ProgramDto;
 use App\Models\ProgramModel;
 use App\Traits\ResponseFormattingTrait;
 use App\Util\Constant;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,7 +17,7 @@ class ProgramController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function index()
     {
@@ -51,7 +52,7 @@ class ProgramController extends Controller
      * Display the specified resource.
      *
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function show($id)
     {
@@ -95,7 +96,7 @@ class ProgramController extends Controller
     }
 
 
-    public function getRootProgram($id)
+    public function getRootProgram($id): JsonResponse
     {
         //get list root program
         $rootProgram = DB::table('program as p')
@@ -112,7 +113,7 @@ class ProgramController extends Controller
                 'p.updated_at')
             ->join('language as la', 'la.id', '=', 'p.language_id')
             ->where('p.parent_id', '=', Constant::PROGRAM_ROOT)
-            ->where('p.language_id', '=',$id)
+            ->where('p.language_id', '=', $id)
             ->orderBy('p.updated_at', 'DESC')
             ->get();
 
@@ -121,8 +122,8 @@ class ProgramController extends Controller
         $rootProgramDto = [];
         foreach ($rootProgram as $rootProgram) {
             //count total vote
-            $totalVote=$this->countTotalVotes($rootProgram->id, $id);
-            $rootProgramDto[] = new RootProgramDto($rootProgram, $totalVote);
+            $totalVote = $this->countTotalVotes($rootProgram->id, $id);
+            $rootProgramDto[] = new ProgramDto($rootProgram, $totalVote);
         }
 
         $response = $this->_formatBaseResponseWithTotal(200, $rootProgramDto, $totalProgram, 'Lấy dữ liệu thành công');
@@ -130,18 +131,158 @@ class ProgramController extends Controller
         return response()->json($response);
     }
 
-    private function countTotalVotes($parent, $langugage)
+    public function getDetailRootProgram(Request $request): JsonResponse
+    {
+        $request->validate([
+            'id' => 'required|integer',
+            'languageId' => 'required|integer',
+        ]);
+
+        $id = $request->input('id');
+        $languageId = $request->input('languageId');
+
+        $rootProgram = DB::table('program as p')
+            ->select('p.id',
+                'p.name',
+                'p.description',
+                'p.language_id',
+                'la.name',
+                'p.avatar_image',
+                'p.cover_image',
+                'p.start_date',
+                'p.end_date',
+                'p.created_at',
+                'p.updated_at')
+            ->join('language as la', 'la.id', '=', 'p.language_id')
+            ->where('p.parent_id', '=', Constant::PROGRAM_ROOT)
+            ->where('p.id', '=', $id)
+            ->where('p.language_id', '=', $languageId)
+            ->orderBy('p.updated_at', 'DESC')
+            ->get();
+
+
+        $rootProgramDto = [];
+        foreach ($rootProgram as $program) {
+            //count total vote
+            $totalVote = $this->countTotalVotes($program->id, $languageId);
+            $rootProgramDto[] = new ProgramDto($rootProgram, $totalVote);
+        }
+
+        $response = $this->_formatBaseResponse(200, $rootProgramDto, 'Lấy dữ liệu thành công');
+
+        return response()->json($response);
+    }
+
+    public function getChildrenProgram(Request $request): JsonResponse
+    {
+        $request->validate([
+            'parentId' => 'required|integer',
+            'languageId' => 'required|integer',
+        ]);
+
+        $parentId = $request->input('parentId');
+        $languageId = $request->input('languageId');
+
+        //get list children program
+        $childrenProgram = DB::table('program as p')
+            ->select('p.id',
+                'p.name',
+                'p.description',
+                'p.language_id',
+                'la.name',
+                'p.avatar_image',
+                'p.cover_image',
+                'p.seo_title',
+                'p.meta_keyword',
+                'p.seo_url',
+                'p.seo_title',
+                'p.meta_description',
+                'p.robots_tag',
+                'p.start_date',
+                'p.end_date',
+                'p.created_at',
+                'p.updated_at')
+            ->join('language as la', 'la.id', '=', 'p.language_id')
+            ->where('p.parent_id', '=', $parentId)
+            ->where('p.language_id', '=', $languageId)
+            ->orderBy('p.updated_at', 'DESC')
+            ->get();
+
+        $totalProgram = $childrenProgram->count();
+
+        $rootProgramDto = [];
+        foreach ($childrenProgram as $childrenProgram) {
+            //count total vote
+            $totalVote = $this->countTotalChildrenVotes($childrenProgram->id, $languageId);
+            $rootProgramDto[] = new ProgramDto($childrenProgram, $totalVote);
+        }
+
+        $response = $this->_formatBaseResponseWithTotal(200, $rootProgramDto, $totalProgram, 'Lấy dữ liệu thành công');
+
+        return response()->json($response);
+    }
+
+    public function getDetailChildProgram(Request $request): JsonResponse
+    {
+        $request->validate([
+            'id' => 'required|integer',
+            'languageId' => 'required|integer',
+        ]);
+
+        $id = $request->input('id');
+        $languageId = $request->input('languageId');
+
+        $childProgram = DB::table('program as p')
+            ->select('p.id',
+                'p.name',
+                'p.description',
+                'p.language_id',
+                'la.name',
+                'p.avatar_image',
+                'p.cover_image',
+                'p.start_date',
+                'p.end_date',
+                'p.created_at',
+                'p.updated_at')
+            ->join('language as la', 'la.id', '=', 'p.language_id')
+            ->where('p.id', '=', $id)
+            ->where('p.language_id', '=', $languageId)
+            ->where('p.parent_id', '!=', Constant::PROGRAM_ROOT)
+            ->orderBy('p.updated_at', 'DESC')
+            ->get();
+
+        $response = $this->_formatBaseResponse(200, $childProgram, 'Lấy dữ liệu thành công');
+
+        return response()->json($response);
+    }
+
+    private function countTotalVotes($parent, $langugage): int
     {
         $childrenProgram = DB::table('vote as v')
-            ->select('p.id',
-                'p.name')
+            ->select('v.id')
             ->join('program as p', 'v.program_id', '=', 'p.id')
             ->join('language as la', 'la.id', '=', 'p.language_id')
             ->where('p.parent_id', '=', $parent)
-            ->where('v.status','=',Constant::VOTE_STATUS__VALID)
-            ->where('p.language_id', '=',$langugage)
+            ->where('v.status', '=', Constant::VOTE_STATUS__VALID)
+            ->where('p.language_id', '=', $langugage)
             ->get();
 
         return $childrenProgram->count();
     }
+
+    private function countTotalChildrenVotes($parent, $langugage): int
+    {
+        $childrenProgram = DB::table('vote as v')
+            ->select('v.id')
+            ->join('program as p', 'v.program_id', '=', 'p.id')
+            ->join('language as la', 'la.id', '=', 'p.language_id')
+            ->where('p.id', '=', $parent)
+            ->where('v.status', '=', Constant::VOTE_STATUS__VALID)
+            ->where('p.language_id', '=', $langugage)
+            ->get();
+
+        return $childrenProgram->count();
+    }
+
+
 }
