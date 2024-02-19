@@ -69,6 +69,7 @@ return array(
     'Facade\\FlareClient\\' => array($vendorDir . '/facade/flare-client-php/src'),
     'Encore\\CustomActionsButton\\' => array($vendorDir . '/nim4n/custom-actions-button/src'),
     'Encore\\CKEditor\\' => array($vendorDir . '/laravel-admin-ext/ckeditor/src'),
+    'Encore\\Admin\\Media\\' => array($vendorDir . '/laravel-admin-ext/media-manager/src'),
     'Encore\\Admin\\' => array($vendorDir . '/encore/laravel-admin/src'),
     'Egulias\\EmailValidator\\' => array($vendorDir . '/egulias/email-validator/src'),
     'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
