@@ -95,11 +95,10 @@ class BannerController extends Controller
         //get list root banner
         $rootBanner = DB::table('vote_banner as vb')
             ->select('vb.id',
-                'vb.name',
+                'vb.name as name',
                 'vb.description',
                 'vb.code',
                 'vb.language_id',
-                'la.name',
                 'vb.created_at',
                 'vb.updated_at')
             ->join('language as la', 'la.id', '=', 'vb.language_id')
