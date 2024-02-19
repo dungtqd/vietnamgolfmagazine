@@ -28,4 +28,14 @@ Route::group([
     $router->resource('/config-seo', AConfigSeoController::class);
     $router->resource('/vote', AVoteController::class);
 
+    //Read
+    $router->resource('/category', ACategoryController::class);
+    $router->resource('/article', AArticleController::class);
+    $router->resource('/special_issue', ASpecialIssueController::class);
+    $router->resource('/contact', AContactController::class);
+    $router->resource('/order-form', AOrderFormController::class);
+    $router->resource('/read-banner', AReadBannerController::class);
+    $router->resource('/partner', APartnerController::class);
+    $router->resource('/advertisement', AAdvertisementController::class);
+
 });

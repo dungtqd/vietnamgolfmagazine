@@ -111,7 +111,7 @@ class ProgramController extends Controller
                 'p.created_at',
                 'p.updated_at')
             ->join('language as la', 'la.id', '=', 'p.language_id')
-            ->where('p.parent_id', '=', Constant::PROGRAM_ROOT)
+            ->where('p.parent_id', '=', Constant::PARENT_ID_ROOT)
             ->where('p.language_id', '=', $id)
             ->orderBy('p.updated_at', 'DESC')
             ->get();
@@ -152,7 +152,7 @@ class ProgramController extends Controller
                 'p.created_at',
                 'p.updated_at')
             ->join('language as la', 'la.id', '=', 'p.language_id')
-            ->where('p.parent_id', '=', Constant::PROGRAM_ROOT)
+            ->where('p.parent_id', '=', Constant::PARENT_ID_ROOT)
             ->where('p.id', '=', $id)
             ->where('p.language_id', '=', $languageId)
             ->orderBy('p.updated_at', 'DESC')
@@ -243,7 +243,7 @@ class ProgramController extends Controller
             ->join('language as la', 'la.id', '=', 'p.language_id')
             ->where('p.id', '=', $id)
             ->where('p.language_id', '=', $languageId)
-            ->where('p.parent_id', '!=', Constant::PROGRAM_ROOT)
+            ->where('p.parent_id', '!=', Constant::PARENT_ID_ROOT)
             ->orderBy('p.updated_at', 'DESC')
             ->get();
 

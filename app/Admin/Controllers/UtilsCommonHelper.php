@@ -2,19 +2,17 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\BranchModel;
-use App\Models\BusinessModel;
 use App\Models\CategoryModel;
 use App\Models\CommonCodeModel;
 use App\Models\LanguageModel;
 use App\Models\LayoutModel;
 use App\Models\ModuleModel;
-use App\Models\ProductGroupModel;
 use App\Models\ProductModel;
 use App\Models\ProgramModel;
 use App\Models\ProvinceModel;
 use App\Models\VoteBannerModel;
 use App\Models\ZoneModel;
+use App\Util\Constant;
 use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Collection;
@@ -43,6 +41,16 @@ class UtilsCommonHelper
     public static function getAllPrograms(): Collection
     {
         return ProgramModel::all()->pluck('name', 'id');
+    }
+
+    public static function getAllCategories(): Collection
+    {
+        return CategoryModel::all()->pluck('name', 'id');
+    }
+
+    public static function getAllChildrenCategories(): Collection
+    {
+        return CategoryModel::all()->where('parent_id','!=',Constant::PARENT_ID_ROOT)->pluck('name', 'id');
     }
 
     public static function getAllProducts(): Collection
