@@ -127,7 +127,6 @@ class ProductController extends Controller
                 'p.name',
                 'p.description',
                 'p.language_id',
-                'la.name',
                 'p.image')
             ->join('program_product as pp', 'p.id', '=', 'pp.product_id')
             ->join('language as la', 'la.id', '=', 'p.language_id')
@@ -234,6 +233,7 @@ class ProductController extends Controller
         $childrenProduct = DB::table('product as p')
             ->select('p.id',
                 'p.name',
+                'p.image',
                 'p.language_id',
                 'p.description')
             ->join('program_product as pp', 'p.id', '=', 'pp.product_id')
