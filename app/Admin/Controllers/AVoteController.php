@@ -31,7 +31,10 @@ class AVoteController extends AdminController
         $grid->column('ip', __('Địa chỉ IP'));
         $grid->column('agent', __('Agent'));
         $grid->column('language.name', __('Ngôn ngữ'));
-        $grid->column('status', __('Trạng thái'));  //todo: thêm convert status
+//        $grid->column('status', __('Trạng thái'));  //todo: thêm convert status
+        $grid->column('status', __('Trạng thái'))->display(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Vote", "Vote_Status","grid");
+        });
         $grid->column('created_at', __('Ngày tạo'))->display(function ($createdAt) {
             return ConstantHelper::dateFormatter($createdAt);
         });

@@ -35,7 +35,10 @@ class AModuleDetailController extends AdminController
         $grid->column('height', __('Kích thước chiều cao'));
         $grid->column('presentation', __('Cách trình bày'));  //TODO: Sau lấy từ config
         $grid->column('position', __('Vị trí')); //TODO: Sau lấy từ config
-        $grid->column('status', __('Trạng thái')); //TODO: Sau lấy từ config
+//        $grid->column('status', __('Trạng thái')); //TODO: Sau lấy từ config
+        $grid->column('status', __('Trạng thái'))->display(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Core",'Status', "grid");
+        });
         $grid->column('order', __('Sắp xếp'));
 
         $grid->column('created_at', __('Ngày tạo'))->display(function ($createdAt) {

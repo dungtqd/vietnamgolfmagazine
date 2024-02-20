@@ -38,4 +38,6 @@ Route::group([
     $router->resource('/partner', APartnerController::class);
     $router->resource('/advertisement', AAdvertisementController::class);
 
+    $router->resource('/common-code', ACommonCodeController::class);
+
 });

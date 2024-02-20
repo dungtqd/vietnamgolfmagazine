@@ -31,8 +31,9 @@ AAdvertisementController extends AdminController
         $grid->column('layout.name', __('Layout'));
         $grid->column('from_date', __('Từ ngày'));
         $grid->column('to_date', __('Tới ngày'));
-        $grid->column('status', __('Trạng thái'));  //TODO: lấy từ config
-
+        $grid->column('status', __('Trạng thái'))->display(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Core",'Status', "grid");
+        });
         $grid->column('created_at', __('Ngày tạo'))->display(function ($createdAt) {
             return ConstantHelper::dateFormatter($createdAt);
         });
@@ -76,6 +77,9 @@ AAdvertisementController extends AdminController
     {
         $layoutOptions = UtilsCommonHelper::getAllLayouts();
         $layoutDefault = $layoutOptions->keys()->first();
+
+        $statusOptions = (new UtilsCommonHelper)->commonCode("Core", "Status", "description_vi", "value");
+        $statusDefault = $statusOptions->keys()->first();
 
         $form = new Form(new AdvertisementModel());
         if ($form->isEditing()) {

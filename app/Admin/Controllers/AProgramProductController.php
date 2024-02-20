@@ -29,7 +29,10 @@ class AProgramProductController extends AdminController
         $grid->column('program.name', __('Tên hạng mục'))->filter('like');
         $grid->column('product.name', __('Tên ứng viên'))->filter('like');
         $grid->column('order', __('Sắp xếp'));
-        $grid->column('status', __('Trạng thái'));  //todo: thêm convert status
+//        $grid->column('status', __('Trạng thái'));  //todo: thêm convert status
+        $grid->column('status', __('Trạng thái'))->display(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Core",'Status', "grid");
+        });
         $grid->column('created_at', __('Ngày tạo'))->display(function ($createdAt) {
             return ConstantHelper::dateFormatter($createdAt);
         });

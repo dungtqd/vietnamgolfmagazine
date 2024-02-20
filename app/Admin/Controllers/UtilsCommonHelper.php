@@ -26,11 +26,13 @@ class UtilsCommonHelper
             return CommonCodeModel::where('group', $group)
                 ->where('type', $type)
                 ->pluck($description, $value);
-        } elseif ($group === "Communication") {
-            return CommonCodeModel::where('group', $group)
-                ->where('type', $type)
-                ->pluck($description, $value);
-        } else {
+        }
+//        elseif ($group === "Communication") {
+//            return CommonCodeModel::where('group', $group)
+//                ->where('type', $type)
+//                ->pluck($description, $value);
+//        }
+        else {
             $commonCode = CommonCodeModel::where('group', $group)
                 ->where('type', $type)
                 ->pluck($description, $value);
@@ -50,7 +52,7 @@ class UtilsCommonHelper
 
     public static function getAllChildrenCategories(): Collection
     {
-        return CategoryModel::all()->where('parent_id','!=',Constant::PARENT_ID_ROOT)->pluck('name', 'id');
+        return CategoryModel::all()->where('parent_id', '!=', Constant::PARENT_ID_ROOT)->pluck('name', 'id');
     }
 
     public static function getAllProducts(): Collection
@@ -98,10 +100,6 @@ class UtilsCommonHelper
         return $commonCode ? $commonCode->$description : '';
     }
 
-    public static function findAllProductGroup()
-    {
-        return ProductGroupModel::all()->where('status', 1)->pluck('name', 'id');
-    }
 
     public static function findAllProduct()
     {
@@ -117,56 +115,34 @@ class UtilsCommonHelper
     }
 
     //Kiem tra ten lai(doi lai)
-    public static function statusFormatter($value, $group, $isGrid)
+    public static function statusFormatter($value, $group, $type, $isGrid): string
     {
         $result = $value ? $value : 0;
-        if ($group === "Core") {
-            $commonCode = CommonCodeModel::where('group', $group)
-                ->where('type', 'Status')
-                ->where('value', $result)
-                ->first();
-        } elseif ($group === "Reply") {
-            $commonCode = CommonCodeModel::where('group', $group)
-                ->where('type', 'Status')
-                ->where('value', $result)
-                ->first();
-        } elseif ($group === "Highlight") {
-            $commonCode = CommonCodeModel::where('group', $group)
-                ->where('type', 'Status')
-                ->where('value', $result)
-                ->first();
-        } elseif ($group === "Product") {
-            $commonCode = CommonCodeModel::where('group', $group)
-                ->where('type', 'FreeShip')
-                ->where('value', $result)
-                ->first();
-        } else {
-            //TODO: CHECK lai
-            $commonCode = CommonCodeModel::where('group', $group)
-                ->where('type', 'Status')
-                ->where('value', $result)
-                ->first();
-        }
+
+        $commonCode = CommonCodeModel::where('group', $group)
+            ->where('type', $type)
+            ->where('value', $result)
+            ->first();
         if ($commonCode && $isGrid === "grid") {
-            if ($group === 'Reply') {
-                switch ($result) {
-                    case 0:
-                        $result = "<span class='label label-danger'>$commonCode->description_vi</span>";
-                        break;
-                    case 1:
-                        $result = "<span class='label label-warning'>$commonCode->description_vi</span>";
-                        break;
-                    case 2:
-                        $result = "<span class='label label-success'>$commonCode->description_vi</span>";
-                        break;
-                    case 3:
-                        $result = "<span class='label ' style='background-color: #97a0b3'>$commonCode->description_vi</span>";
-                        break;
-                }
-                return $result;
-            } else {
-                return $result === 1 ? "<span class='label label-success'>$commonCode->description_vi</span>" : "<span class='label label-danger'>$commonCode->description_vi</span>";
-            }
+//            if ($group === 'Vote') {
+//                switch ($result) {
+//                    case 0:
+//                        $result = "<span class='label label-danger'>$commonCode->description_vi</span>";
+//                        break;
+//                    case 1:
+//                        $result = "<span class='label label-warning'>$commonCode->description_vi</span>";
+//                        break;
+//                    case 2:
+//                        $result = "<span class='label label-success'>$commonCode->description_vi</span>";
+//                        break;
+//                    case 3:
+//                        $result = "<span class='label ' style='background-color: #97a0b3'>$commonCode->description_vi</span>";
+//                        break;
+//                }
+//                return $result;
+//            } else {
+            return $result === 1 ? "<span class='label label-success'>$commonCode->description_vi</span>" : "<span class='label label-danger'>$commonCode->description_vi</span>";
+//            }
         }
 
 

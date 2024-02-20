@@ -36,8 +36,10 @@ AReadBannerController extends AdminController
         $grid->column('layout.name', __('Layout'));
         $grid->column('type', __('Hiển thị'));  //TODO: sau lay tu config các cách hiển thị: slideshow, default,...
         $grid->column('note', __('Ghi chú'));
-        $grid->column('status', __('Trạng thái'));  //TODO: lấy từ config
-
+//        $grid->column('status', __('Trạng thái'));  //TODO: lấy từ config
+        $grid->column('status', __('Trạng thái'))->display(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Core",'Status', "grid");
+        });
 
         $grid->column('created_at', __('Ngày tạo'))->display(function ($createdAt) {
             return ConstantHelper::dateFormatter($createdAt);

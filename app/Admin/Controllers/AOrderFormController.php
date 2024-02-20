@@ -34,8 +34,10 @@ class AOrderFormController extends AdminController
         $grid->column('from_month', __('Từ tháng'));
         $grid->column('to_month', __('Tới tháng'));
         $grid->column('note', __('Ghi chú'));
-        $grid->column('order_status', __('Trạng thái đặt hàng'));  //TODO: lấy từ config
-
+//        $grid->column('order_status', __('Trạng thái đặt hàng'));  //TODO: lấy từ config
+        $grid->column('order_status', __('Trạng thái đặt hàng'))->display(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Read", "Order_Status","grid");
+        });
         $grid->column('created_at', __('Ngày tạo'))->display(function ($createdAt) {
             return ConstantHelper::dateFormatter($createdAt);
         });
