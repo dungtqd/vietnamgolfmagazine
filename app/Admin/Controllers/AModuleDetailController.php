@@ -33,13 +33,17 @@ class AModuleDetailController extends AdminController
         $grid->column('module.name', __('Module'));
         $grid->column('width', __('Kích thước chiều dài'));
         $grid->column('height', __('Kích thước chiều cao'));
-        $grid->column('presentation', __('Cách trình bày'));  //TODO: Sau lấy từ config
-        $grid->column('position', __('Vị trí')); //TODO: Sau lấy từ config
-//        $grid->column('status', __('Trạng thái')); //TODO: Sau lấy từ config
+//        $grid->column('presentation', __('Cách trình bày'));  //TODO: Sau lấy từ config
+        $grid->column('presentation', __('Cách trình bày'))->display(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Vote",'Presentation', null);
+        });
+        $grid->column('position', __('Vị trí'))->display(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Vote",'Position', null);
+        });
+        $grid->column('order', __('Sắp xếp'));
         $grid->column('status', __('Trạng thái'))->display(function ($status) {
             return UtilsCommonHelper::statusFormatter($status, "Core",'Status', "grid");
         });
-        $grid->column('order', __('Sắp xếp'));
 
         $grid->column('created_at', __('Ngày tạo'))->display(function ($createdAt) {
             return ConstantHelper::dateFormatter($createdAt);
@@ -69,9 +73,15 @@ class AModuleDetailController extends AdminController
         $show->field('module.name', __('Module'));
         $show->field('width', __('Kích thước chiều dài'));
         $show->field('height', __('Kích thước chiều cao'));
-        $show->field('presentation', __('Cách trình bày')); //TODO: Sau lấy từ config
-        $show->field('position', __('Vị trí')); //TODO: Sau lấy từ config
-        $show->field('status', __('Trạng thái'));  //TODO: Sau lấy từ config
+        $show->field('presentation', __('Cách trình bày'))->as(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Vote", 'Presentation',null);
+        });
+        $show->field('position', __('Vị trí'))->as(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Vote", 'Position',null);
+        });
+        $show->field('status', __('Trạng thái'))->as(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Core", 'Status',null);
+        });
         $show->field('order', __('Sắp xếp'));
 
         $show->field('created_at', __('Ngày tạo'));
@@ -99,6 +109,15 @@ class AModuleDetailController extends AdminController
         $layoutOptions = (new UtilsCommonHelper)->getAllLayouts();
         $layoutDefault = $layoutOptions->keys()->first();
 
+        $statusOptions = (new UtilsCommonHelper)->commonCode("Core", "Status", "description_vi", "value");
+        $statusDefault = $statusOptions->keys()->first();
+
+        $presentationOptions = (new UtilsCommonHelper)->commonCode("Vote", "Presentation", "description_vi", "value");
+        $presentationDefault = $presentationOptions->keys()->first();
+
+        $positionOptions = (new UtilsCommonHelper)->commonCode("Vote", "Position", "description_vi", "value");
+        $positionDefault = $positionOptions->keys()->first();
+
         $form = new Form(new ModuleDetailModel());
         if ($form->isEditing()) {
             $id = request()->route()->parameter('module_detail');
@@ -119,9 +138,9 @@ class AModuleDetailController extends AdminController
         $form->ckeditor('title', __('Tiêu đề'));
         $form->number('width', __('Kích thước chiều dài'));
         $form->number('height', __('Kích thước chiều cao'));
-        $form->text('presentation', __('Cách trình bày'));  //TODO: Sau lấy từ config -> sửa thành select
-        $form->text('position', __('Vị trí')); //TODO: Sau lấy từ config -> sửa thành select
-        $form->number('status', __('Trạng thái')); //TODO: Sau lấy từ config
+        $form->select('presentation', __('Cách trình bày'))->options($presentationOptions)->default($presentationDefault)->required();
+        $form->select('position', __('Vị trí'))->options($positionOptions)->default($positionDefault)->required();
+        $form->select('status', __('Trạng thái'))->options($statusOptions)->default($statusDefault)->required();
         $form->number('order', __('Sắp xếp'));
 
         return $form;

@@ -28,11 +28,11 @@ class AProgramController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new ProgramModel());
+        $grid->column('parent.name', __('Hạng mục cha'));
         $grid->column('name', __('Tên hạng mục bình chọn'))->filter('like');
         $grid->column('description', __('Mô tả'))->textarea();
         $grid->column('avatar_image', __('Ảnh đại diện'))->image();
-        $grid->column('cover_image', __('Ảnh bìa'))->image();
-        $grid->column('parent.name', __('Hạng mục cha'));
+//        $grid->column('cover_image', __('Ảnh bìa'))->image();
         $grid->column('seo_title', __('Tiêu đề SEO'));
         $grid->column('meta_keyword', __('Meta keyword'));
         $grid->column('seo_url', __('SEO URL'));
@@ -64,7 +64,7 @@ class AProgramController extends AdminController
         $show->field('name', __('Tên hạng mục bình chọn'));
         $show->field('description', __('Mô tả'));
         $show->field('avatar_image', __('Ảnh đại diện'))->image();
-        $show->field('cover_image', __('Ảnh bìa'))->image();
+//        $show->field('cover_image', __('Ảnh bìa'))->image();
         $show->field('parent.name', __('Hạng mục cha'));
         $show->field('seo_title', __('Tiêu đề SEO'));
         $show->field('meta_keyword', __('Meta keyword'));
@@ -106,7 +106,7 @@ class AProgramController extends AdminController
         $form->text('name', __('Tên hạng mục bình chọn'))->required();
         $form->textarea('description', __('Mô tả'));
         $form->image('avatar_image', __('Ảnh đại diện'));
-        $form->image('cover_image', __('Ảnh bìa'));
+//        $form->image('cover_image', __('Ảnh bìa'));
         $form->text('seo_title', __('Tiêu đề SEO'));
         $form->text('meta_keyword', __('Meta keyword'));
         $form->text('seo_url', __('SEO URL'));

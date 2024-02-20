@@ -57,7 +57,9 @@ class AProgramProductController extends AdminController
         $show->field('program.name', __('Tên hạng mục'));
         $show->field('product.name', __('Tên ứng viên'));
         $show->field('order', __('Sắp xếp'));
-        $show->field('status', __('Trạng thái'));  //todo: thêm format status
+        $show->field('status', __('Trạng thái'))->as(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Core", 'Status',null);
+        });
 
         $show->field('created_at', __('Ngày tạo'));
         $show->field('updated_at', __('Ngày cập nhật'));
@@ -72,12 +74,14 @@ class AProgramProductController extends AdminController
      */
     protected function form()
     {
-        $programOptions = (new UtilsCommonHelper)->getAllPrograms();
+        $programOptions = UtilsCommonHelper::getAllPrograms();
         $programDefault = $programOptions->keys()->first();
 
-        $productOptions = (new UtilsCommonHelper)->getAllProducts();
+        $productOptions = UtilsCommonHelper::getAllProducts();
         $productDefault = $productOptions->keys()->first();
 
+        $statusOptions = UtilsCommonHelper::commonCode("Core", "Status", "description_vi", "value");
+        $statusDefault = $statusOptions->keys()->first();
 
         $form = new Form(new ProgramProductModel());
         if ($form->isEditing()) {
@@ -94,7 +98,9 @@ class AProgramProductController extends AdminController
         }
 
         $form->number('order', __('Sắp xếp'));
-        $form->number('status', __('Trạng thái'));  //todo: thêm trạng thái từ bảng config
+//        $form->number('status', __('Trạng thái'));  //todo: thêm trạng thái từ bảng config
+        $form->select('status', __('Trạng thái'))->options($statusOptions)->default($statusDefault)->required();
+
 
         return $form;
     }

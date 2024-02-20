@@ -80,10 +80,10 @@ class AVoteController extends AdminController
         $programOptions = (new UtilsCommonHelper)->getAllPrograms(); //TODO: check ko cho chon product co parent_id=0
         $programDefault = $programOptions->keys()->first();
 
-        $productOptions = (new UtilsCommonHelper)->getAllProducts();
+        $productOptions = UtilsCommonHelper::getAllProducts();
         $productDefault = $productOptions->keys()->first();
 
-        $languageOptions = (new UtilsCommonHelper)->getAllLanguages();
+        $languageOptions = UtilsCommonHelper::getAllLanguages();
         $languageDefault = $languageOptions->keys()->first();
 
 
@@ -95,7 +95,7 @@ class AVoteController extends AdminController
             $provinceId = $form->model()->find($id)->getOriginal("product_id");
 
             $form->select('program_id', __('Tên hạng mục'))->options($programOptions)->default($programId);
-            $form->select('product_id', __('Tên ứng viên'))->options($productOptions)->default($provinceId);  //TODO: nghiên cứu dùng multiSelect
+            $form->select('product_id', __('Tên ứng viên'))->options($productOptions)->default($provinceId);
         } else {
             $form->select('program_id', __('Tên hạng mục'))->options($programOptions)->required()->default($programDefault);
             $form->select('product_id', __('Tên ứng viên'))->options($productOptions)->required()->default($productDefault);

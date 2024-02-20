@@ -60,8 +60,9 @@ AAdvertisementController extends AdminController
         $show->field('layout.name', __('Layout'));
         $show->field('from_date', __('Từ ngày'));
         $show->field('to_date', __('Tới ngày'));
-        $show->field('status', __('Trạng thái'));  //TODO: lấy từ config
-
+        $show->field('status', __('Trạng thái'))->as(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Core", 'Status',null);
+        });
         $show->field('created_at', __('Ngày tạo'));
         $show->field('updated_at', __('Ngày cập nhật'));
 
@@ -91,8 +92,7 @@ AAdvertisementController extends AdminController
         $form->select('layout_id', __('Layout'))->options($layoutOptions)->required()->default($layoutDefault);
         $form->date('from_date', __('Từ ngày'))->format('YYYY-MM-DD')->required();
         $form->date('to_date', __('Tới ngày'))->format('YYYY-MM-DD')->required();
-        $form->number('status', __('Trạng thái'))->required();  //TODO: lấy từ config chuyển sang select
-
+        $form->select('status', __('Trạng thái'))->options($statusOptions)->default($statusDefault)->required();
         return $form;
     }
 }

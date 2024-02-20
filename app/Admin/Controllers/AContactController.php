@@ -27,7 +27,6 @@ class AContactController extends AdminController
     {
         $grid = new Grid(new ContactModel());
         $grid->column('email', __('Email'))->filter('like');
-//        $grid->column('subscribe_status', __('Trạng thái'));  //TODO: lấy từ confi
         $grid->column('subscribe_status', __('Trạng thái'))->display(function ($status) {
             error_log($status);
             return UtilsCommonHelper::statusFormatter($status, "Read", 'Subscribe_Status', "grid");

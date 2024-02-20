@@ -66,8 +66,9 @@ class AOrderFormController extends AdminController
         $show->field('from_month', __('Từ tháng'));
         $show->field('to_month', __('Tới tháng'));
         $show->field('note', __('Ghi chú'));
-        $show->field('order_status', __('Trạng thái đặt hàng'));  //TODO: lấy từ config
-
+        $show->field('order_status', __('Trạng thái đặt hàng'))->as(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Read", 'Order_Status',null);
+        });
         $show->field('created_at', __('Ngày tạo'));
         $show->field('updated_at', __('Ngày cập nhật'));
 
@@ -81,6 +82,8 @@ class AOrderFormController extends AdminController
      */
     protected function form()
     {
+        $statusOptions = UtilsCommonHelper::commonCode("Read", "Order_Status", "description_vi", "value");
+        $statusDefault = $statusOptions->keys()->first();
 
         $form = new Form(new OrderFormModel());
         if ($form->isEditing()) {
@@ -93,7 +96,7 @@ class AOrderFormController extends AdminController
         $form->date('from_month', __('Từ tháng'))->format('YYYY-MM-DD')->required();
         $form->date('to_month', __('Tới tháng'))->format('YYYY-MM-DD')->required();
         $form->text('note', __('Ghi chú'));
-        $form->number('order_status', __('Trạng thái đặt hàng'))->required();  //TODO: lấy từ config chuyển sang select
+        $form->number('order_status', __('Trạng thái đặt hàng'))->options($statusOptions)->default($statusDefault)->required();
 
         return $form;
     }

@@ -52,7 +52,7 @@ class ALayoutController extends AdminController
         $show = new Show(LayoutModel::findOrFail($id));
         $show->field('name', __('Tên layout'));
         $show->field('description', __('Mô tả'));
-        $show->field('router', __('Đường dẫn'))->image();
+        $show->field('router', __('Đường dẫn'));
 
         $show->field('created_at', __('Ngày tạo'));
         $show->field('updated_at', __('Ngày cập nhật'));
