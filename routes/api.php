@@ -41,3 +41,11 @@ Route::post('/vote/count-by-program', 'VoteController@countVoteByProgram');
 Route::post('/vote/count-by-program-and-product', 'VoteController@countVoteByProgramAndProduct');
 //banner
 Route::get('/banner/get-root-banner/{languageId}', 'BannerController@getAll');
+
+//***************Read****************************
+//category
+Route::get('/category/get-root-category/{id}', 'CategoryController@getRootCategory');
+//article
+Route::post('/article/get-by-category', 'ArticleController@getAllByCategory');
+Route::get('/article/get-by-slug', 'ArticleController@getBySlug');
+
