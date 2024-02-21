@@ -155,7 +155,9 @@ class VoteController extends Controller
     {
         $vote = DB::table('vote as vo')
             ->select('vo.id')
+            ->join('program_product as pp','vo.program_product_id','=','pp.id')
             ->where('vo.status', '=', Constant::VOTE_STATUS__VALID)
+            ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
             ->get();
         $total = $vote->count();
 

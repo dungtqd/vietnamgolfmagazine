@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AlertModel;
+use App\Admin\Controllers\UtilsCommonHelper;
 use App\Models\dto\ProductDto;
-use App\Models\ZoneModel;
 use App\Traits\ResponseFormattingTrait;
 use App\Util\Constant;
 use Exception;
@@ -23,10 +22,6 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $alerts = AlertModel::all();
-        $total = $alerts->count();
-        $response = $this->_formatBaseResponseWithTotal(200, $alerts, $total, 'Lấy dữ liệu thành công');
-        return response()->json($response);
     }
 
     /**
@@ -47,9 +42,6 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $alert = AlertModel::create($request->all());
-        $response = $this->_formatBaseResponse(201, $alert, 'Tạo mới cảnh báo thành công');
-        return response()->json($response);
     }
 
     /**
@@ -113,24 +105,26 @@ class ProductController extends Controller
     public function getRankByProgram(Request $request): JsonResponse
     {
         $request->validate([
-            'programId' => 'required|integer',
+            'programCode' => 'required|string',
             'languageId' => 'required|integer',
         ]);
 
 
-        $programId = $request->input('programId');
+        $programCode= $request->input('programCode');
         $languageId = $request->input('languageId');
 
         //get list children program
         $childrenProduct = DB::table('product as p')
             ->select('p.id',
                 'p.name',
+                'p.code',
                 'p.description',
                 'p.language_id',
                 'p.image')
             ->join('program_product as pp', 'p.id', '=', 'pp.product_id')
-            ->join('language as la', 'la.id', '=', 'p.language_id')
-            ->where('pp.program_id', '=', $programId)
+//            ->join('language as la', 'la.id', '=', 'p.language_id')
+            ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
+            ->where('pp.program_code', '=', $programCode)
             ->where('p.language_id', '=', $languageId)
             ->orderBy('p.updated_at', 'DESC')
             ->get();
@@ -140,8 +134,11 @@ class ProductController extends Controller
 
         $rootProductDto = [];
         foreach ($childrenProduct as $childrenProduct) {
+            //find program
+            $programProduct=UtilsCommonHelper::getProgramProductByCode($programCode, $childrenProduct->code);
+
             //count total vote
-            $totalVote = $this->countVoteByProgramAndProduct($programId, $childrenProduct->id, $languageId);
+            $totalVote = $this->countVoteByProgramAndProduct($programProduct->id);
             $rootProductDto[] = new ProductDto($childrenProduct, $totalVote);
         }
 
@@ -154,13 +151,14 @@ class ProductController extends Controller
         return response()->json($response);
     }
 
-    private function countVoteByProgramAndProduct($programId, $productId, $languageId): int
+    private function countVoteByProgramAndProduct($programProductId): int
     {
         $vote = DB::table('vote as vo')
             ->select('vo.id')
-            ->where('vo.program_id', '=', $programId)
-            ->where('vo.product_id', '=', $productId)
+            ->join('program_product as pp', 'pp.id', '=', 'vo.program_product_id')
             ->where('vo.status', '=', Constant::VOTE_STATUS__VALID)
+            ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
+            ->where('pp.id', '=', $programProductId)
             ->get();
         return $vote->count();
     }
@@ -168,14 +166,14 @@ class ProductController extends Controller
     public function getAllByProgram(Request $request): JsonResponse
     {
         $request->validate([
-            'programId' => 'required|integer',
+            'programCode' => 'required|string',
             'languageId' => 'required|integer',
             'productName' => 'nullable|string',
         ]);
 
         $perPage = $request->input('limit', 16);
 
-        $programId = $request->input('programId');
+        $programCode = $request->input('programCode');
         $languageId = $request->input('languageId');
         $productName = $request->input('productName');
 
@@ -184,11 +182,11 @@ class ProductController extends Controller
             $childrenProduct = DB::table('product as p')
                 ->select('p.id',
                     'p.name',
+                    'p.code',
                     'p.language_id',
                     'p.description')
                 ->join('program_product as pp', 'p.id', '=', 'pp.product_id')
-                ->join('program as po', 'po.id', '=', 'pp.program_id')
-                ->where('po.id', '=', $programId)
+                ->where('pp.program_code', '=', $programCode)
                 ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
                 ->where('p.language_id', '=', $languageId)
                 ->orderBy('pp.order', 'ASC')
@@ -201,8 +199,7 @@ class ProductController extends Controller
                     'p.language_id',
                     'p.description')
                 ->join('program_product as pp', 'p.id', '=', 'pp.product_id')
-                ->join('program as po', 'po.id', '=', 'pp.program_id')
-                ->where('po.id', '=', $programId)
+                ->where('pp.program_code', '=', $programCode)
                 ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
                 ->where('p.name', 'like', '%' . $productName . '%')
                 ->where('p.language_id', '=', $languageId)
@@ -218,31 +215,27 @@ class ProductController extends Controller
         return response()->json($response);
     }
 
-    public function getDetailByIdAndProgram(Request $request): JsonResponse
+    public function getDetailById(Request $request): JsonResponse
     {
         $request->validate([
-            'programId' => 'required|integer',
+//            'programId' => 'required|integer',
             'languageId' => 'required|integer',
             'productId' => 'required|integer',
         ]);
 
-        $programId = $request->input('programId');
+//        $programId = $request->input('programId');
         $languageId = $request->input('languageId');
         $productId = $request->input('productId');
 
         $childrenProduct = DB::table('product as p')
             ->select('p.id',
                 'p.name',
+                'p.code',
                 'p.image',
                 'p.language_id',
                 'p.description')
-            ->join('program_product as pp', 'p.id', '=', 'pp.product_id')
-            ->join('program as po', 'po.id', '=', 'pp.program_id')
-            ->where('po.id', '=', $programId)
             ->where('p.id', '=', $productId)
-            ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
             ->where('p.language_id', '=', $languageId)
-            ->orderBy('pp.order', 'ASC')
             ->get();
 
         $response = $this->_formatBaseResponse(200, $childrenProduct, 'Lấy dữ liệu thành công');

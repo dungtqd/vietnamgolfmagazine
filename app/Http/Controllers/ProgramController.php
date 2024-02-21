@@ -102,6 +102,7 @@ class ProgramController extends Controller
         $rootProgram = DB::table('program as p')
             ->select('p.id',
                 'p.name',
+                'p.code',
                 'p.description',
                 'p.language_id',
                 'p.avatar_image',
@@ -121,7 +122,7 @@ class ProgramController extends Controller
         $rootProgramDto = [];
         foreach ($rootProgram as $rootProgram) {
             //count total vote
-            $totalVote = $this->countTotalVotes($rootProgram->id, $id);
+            $totalVote = $this->countTotalVotes($rootProgram->id);
             $rootProgramDto[] = new ProgramDto($rootProgram, $totalVote);
         }
 
@@ -162,7 +163,7 @@ class ProgramController extends Controller
         $rootProgramDto = [];
         foreach ($rootProgram as $program) {
             //count total vote
-            $totalVote = $this->countTotalVotes($program->id, $languageId);
+            $totalVote = $this->countTotalVotes($program->id);
             $rootProgramDto[] = new ProgramDto($rootProgram, $totalVote);
         }
 
@@ -185,6 +186,7 @@ class ProgramController extends Controller
         $childrenProgram = DB::table('program as p')
             ->select('p.id',
                 'p.name',
+                'p.code',
                 'p.description',
                 'p.language_id',
                 'p.avatar_image',
@@ -210,7 +212,7 @@ class ProgramController extends Controller
         $rootProgramDto = [];
         foreach ($childrenProgram as $childrenProgram) {
             //count total vote
-            $totalVote = $this->countTotalChildrenVotes($childrenProgram->id, $languageId);
+            $totalVote = $this->countTotalChildrenVotes($childrenProgram->code);
             $rootProgramDto[] = new ProgramDto($childrenProgram, $totalVote);
         }
 
@@ -252,29 +254,28 @@ class ProgramController extends Controller
         return response()->json($response);
     }
 
-    private function countTotalVotes($parent, $langugage): int
+    private function countTotalVotes($parent): int
     {
         $childrenProgram = DB::table('vote as v')
             ->select('v.id')
             ->join('program as p', 'v.program_id', '=', 'p.id')
-            ->join('language as la', 'la.id', '=', 'p.language_id')
             ->where('p.parent_id', '=', $parent)
             ->where('v.status', '=', Constant::VOTE_STATUS__VALID)
-            ->where('p.language_id', '=', $langugage)
             ->get();
 
         return $childrenProgram->count();
     }
 
-    private function countTotalChildrenVotes($parent, $langugage): int
+    private function countTotalChildrenVotes($programCode): int
     {
         $childrenProgram = DB::table('vote as v')
             ->select('v.id')
-            ->join('program as p', 'v.program_id', '=', 'p.id')
-            ->join('language as la', 'la.id', '=', 'p.language_id')
-            ->where('p.id', '=', $parent)
+            ->join('program_product as p', 'v.program_product_id', '=', 'p.id')
+//            ->join('language as la', 'la.id', '=', 'p.language_id')
+            ->where('p.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
             ->where('v.status', '=', Constant::VOTE_STATUS__VALID)
-            ->where('p.language_id', '=', $langugage)
+            ->where('p.program_code', '=', $programCode)
+//            ->where('p.language_id', '=', $langugage)
             ->get();
 
         return $childrenProgram->count();

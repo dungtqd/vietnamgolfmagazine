@@ -113,6 +113,12 @@ class UtilsCommonHelper
         return ProgramProductModel::all()
             ->where('id', '=',$programProductid)->first();
     }
+    public static function getProgramProductByCode($programCode, $productCode)
+    {
+        return ProgramProductModel::all()
+            ->where('program_code', '=',$programCode)
+            ->where('product_code', '=', $productCode)->first();
+    }
 
     public static function getOriginalLanguage()
     {

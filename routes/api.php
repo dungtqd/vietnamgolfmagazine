@@ -32,7 +32,8 @@ Route::post('/program/get-detail-children-program', 'ProgramController@getDetail
 //product
 Route::post('/product/get-rank-by-program', 'ProductController@getRankByProgram');
 Route::post('/product/get-all-by-program', 'ProductController@getAllByProgram');
-Route::post('/product/get-detail-by-id-and-program', 'ProductController@getDetailByIdAndProgram');
+Route::post('/product/get-detail-by-id', 'ProductController@getDetailById');
+Route::post('/program-product/get-by-code', 'ProgramProductController@getByProgramCodeAndProductCode');
 
 //vote
 Route::get('/vote/count-total', 'VoteController@countTotalVote');
