@@ -117,7 +117,7 @@ class AProductController extends AdminController
             $languageId = $form->model()->find($id)->getOriginal("language_id");
             $originalProductId = $form->model()->find($id)->getOriginal("original_product");
 
-            $form->select('language_id', __('Ngôn ngữ'))->disable()->value($languageId);
+//            $form->select('language_id', __('Ngôn ngữ'))->default($languageId)->disable();
             $form->select('original_product', __('Hạng mục gốc theo ngôn ngữ'))->disable()->value($originalProductId);
 
             $form->text('code', __('Mã code'))->disable()->required();

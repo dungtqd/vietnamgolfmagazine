@@ -107,10 +107,11 @@ class AProgramController extends AdminController
         if ($form->isEditing()) {
             $id = request()->route()->parameter('program');
             $parentId = $form->model()->find($id)->getOriginal("parent_id");
-            $languageId = $form->model()->find($id)->getOriginal("language_id");
+//            $languageId = $form->model()->find($id)->getOriginal("language_id");
+//            dd()
             $originalProgramId = $form->model()->find($id)->getOriginal("original_program");
 
-            $form->select('language_id', __('Ngôn ngữ'))->disable()->value($languageId);
+//            $form->select('language_id', __('Ngôn ngữ'))->disable()->value($languageId);
             $form->select('parent_id', __('Hạng mục cha'))->options($programOptions)->default($parentId);
             $form->select('original_program', __('Hạng mục gốc theo ngôn ngữ'))->disable()->value($originalProgramId);
             $form->text('code', __('Mã hạng mục'))->disable()->required();
