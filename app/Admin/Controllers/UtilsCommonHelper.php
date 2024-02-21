@@ -17,32 +17,40 @@ use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Ramsey\Uuid\UuidInterface;
 
 class UtilsCommonHelper
 {
     public static function commonCode($group, $type, $description, $value)
     {
-        if ($group === "Core") {
-            return CommonCodeModel::where('group', $group)
-                ->where('type', $type)
-                ->pluck($description, $value);
-        }
-//        elseif ($group === "Communication") {
-//            return CommonCodeModel::where('group', $group)
-//                ->where('type', $type)
-//                ->pluck($description, $value);
-//        }
-        else {
-            $commonCode = CommonCodeModel::where('group', $group)
-                ->where('type', $type)
-                ->pluck($description, $value);
-            return $commonCode;
-        }
+        return CommonCodeModel::where('group', $group)
+            ->where('type', $type)
+            ->pluck($description, $value);
     }
 
     public static function getAllPrograms(): Collection
     {
         return ProgramModel::all()->pluck('name', 'id');
+    }
+
+    public static function getExistProgramCode($originalProgramId, $languageId)
+    {
+        $program= ProgramModel::all()
+            ->where('id', '=', $originalProgramId)
+            ->where('language_id', '==', $languageId)->first();
+        return $program->code;
+    }
+    public static function getOriginalProgram(): Collection
+    {
+        $language = LanguageModel::all()->where('code','=',Constant::LANGUAGE_DEFAULT)->first();
+        return ProgramModel::all()
+            ->where('language_id', '=', $language->id)
+            ->pluck('name', 'id');
+    }
+    public static function getOriginalLanguage()
+    {
+        $language = LanguageModel::all()->where('code','=',Constant::LANGUAGE_DEFAULT)->first();
+        return $language->id;
     }
 
     public static function getAllCategories(): Collection
@@ -182,6 +190,11 @@ class UtilsCommonHelper
         $userId = Str::padLeft(Admin::user()->id, 6, '0');
         $code = $type . $today . $userId . $time;
         return $code;
+    }
+
+    public static function generateCode(): UuidInterface
+    {
+        return Str::uuid();
     }
 
     public static function create_slug($string)

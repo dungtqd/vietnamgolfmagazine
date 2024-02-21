@@ -11,4 +11,5 @@ abstract class Constant
     const PROGRAM_PRODUCT_STATUS__ACTIVE = 1;
 
     public const PARENT_ID_ROOT = 0;
+    public const LANGUAGE_DEFAULT = 'vi';
 }

@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Models\CategoryModel;
 use App\Models\ProductModel;
 use App\Models\ProgramModel;
+use App\Util\Constant;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -28,7 +29,9 @@ class AProgramController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new ProgramModel());
+        $grid->column('language.name', __('Ngôn ngữ'));
         $grid->column('parent.name', __('Hạng mục cha'));
+        $grid->column('code', __('Mã hạng mục'));
         $grid->column('name', __('Tên hạng mục bình chọn'))->filter('like');
         $grid->column('description', __('Mô tả'))->textarea();
         $grid->column('avatar_image', __('Ảnh đại diện'))->image();
@@ -61,6 +64,8 @@ class AProgramController extends AdminController
     protected function detail($id)
     {
         $show = new Show(ProgramModel::findOrFail($id));
+        $show->field('language.name', __('Ngôn ngữ'));
+        $show->field('code', __('Mã hạng mục'));
         $show->field('name', __('Tên hạng mục bình chọn'));
         $show->field('description', __('Mô tả'));
         $show->field('avatar_image', __('Ảnh đại diện'))->image();
@@ -86,27 +91,61 @@ class AProgramController extends AdminController
      */
     protected function form()
     {
-        $programOptions = (new UtilsCommonHelper)->getAllPrograms();
-        $programOptions->prepend('Không có','0');
+        $programOptions = UtilsCommonHelper::getAllPrograms();
+        $programOptions->prepend('Không có', '0');
         $programDefault = $programOptions->keys()->first();
 
-        $languageOptions = (new UtilsCommonHelper)->getAllLanguages();
+        //ngôn ngữ default lúc tạo là tiếng Việt
+        $originalProgramOptions = UtilsCommonHelper::getOriginalProgram();
+        $originalProgramOptions->prepend('Không có', '0');
+        $originalProgramDefault = $originalProgramOptions->keys()->first();
+
+        $languageOptions = UtilsCommonHelper::getAllLanguages();
         $languageDefault = $languageOptions->keys()->first();
 
         $form = new Form(new ProgramModel());
         if ($form->isEditing()) {
             $id = request()->route()->parameter('program');
             $parentId = $form->model()->find($id)->getOriginal("parent_id");
+            $languageId = $form->model()->find($id)->getOriginal("language_id");
+            $originalProgramId = $form->model()->find($id)->getOriginal("original_program");
 
+            $form->select('language_id', __('Ngôn ngữ'))->disable()->value($languageId);
             $form->select('parent_id', __('Hạng mục cha'))->options($programOptions)->default($parentId);
+            $form->select('original_program', __('Hạng mục gốc theo ngôn ngữ'))->disable()->value($originalProgramId);
+            $form->text('code', __('Mã hạng mục'))->disable()->required();
         } else {
-            $form->select('parent_id', __('Hạng mục cha'))->options($programOptions)->required()->default($programDefault);
             $form->select('language_id', __('Ngôn ngữ'))->options($languageOptions)->required()->default($languageDefault);
+            $form->select('parent_id', __('Hạng mục cha'))->options($programOptions)->required()->default($programDefault);
+            $form->select('original_program', __('Hạng mục gốc theo ngôn ngữ'))->options($originalProgramOptions)->required()->default($originalProgramDefault);
+            $form->hidden('code', __('Mã hạng mục'));
+
+            $form->saving(function ($form) {
+                $originalProgramId = $form->original_program;
+                $intOriginalProgramId= (int)$originalProgramId;
+
+                $languageId = $form->language_id;
+                $intLanguageId= (int)$languageId;
+                $languageDefault = UtilsCommonHelper::getOriginalLanguage();
+                //check neu ngon ngu goc + original_program =0 thi tao ma code
+                if ($intLanguageId === $languageDefault && $intOriginalProgramId === Constant::PARENT_ID_ROOT) {
+                    //tao moi ma code
+                    error_log("tao moi ma code");
+                    $form->code = UtilsCommonHelper::generateCode();
+                }else{
+                    //tim ma code cu
+                    $existCode=UtilsCommonHelper::getExistProgramCode($originalProgramId, $languageDefault);
+                    error_log("lay lai code cu");
+                    error_log($existCode);
+                    $form->code =$existCode;
+                }
+            });
         }
         $form->text('name', __('Tên hạng mục bình chọn'))->required();
         $form->textarea('description', __('Mô tả'));
         $form->image('avatar_image', __('Ảnh đại diện'));
-//        $form->image('cover_image', __('Ảnh bìa'));
+
+
         $form->text('seo_title', __('Tiêu đề SEO'));
         $form->text('meta_keyword', __('Meta keyword'));
         $form->text('seo_url', __('SEO URL'));
@@ -114,6 +153,8 @@ class AProgramController extends AdminController
         $form->text('robots_tag', __('Robots tag'));
         $form->datetime('start_date', __('Ngày bắt đầu'))->required();
         $form->datetime('end_date', __('Ngày kết thúc'))->required();
+
+
 
         return $form;
     }

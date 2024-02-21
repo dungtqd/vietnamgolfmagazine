@@ -17,6 +17,10 @@ class ProgramModel extends Model
     {
         return $this->belongsTo(__CLASS__, 'parent_id');
     }
+    public function originalProgram(): BelongsTo
+    {
+        return $this->belongsTo(__CLASS__, 'original_program');
+    }
 
     protected $hidden = [
     ];
