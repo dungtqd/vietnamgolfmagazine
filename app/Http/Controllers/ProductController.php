@@ -146,7 +146,7 @@ class ProductController extends Controller
         $collection = collect($rootProductDto);
         $sortedCollection = $collection->sortByDesc('totalVote');
 
-        $response = $this->_formatBaseResponseWithTotal(200, $sortedCollection, $totalProgram, 'Lấy dữ liệu thành công');
+        $response = $this->_formatBaseResponseWithTotal(200, $rootProductDto, $totalProgram, 'Lấy dữ liệu thành công');
 
         return response()->json($response);
     }
