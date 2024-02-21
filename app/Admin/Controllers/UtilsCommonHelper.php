@@ -40,10 +40,25 @@ class UtilsCommonHelper
             ->where('language_id', '==', $languageId)->first();
         return $program->code;
     }
+
+    public static function getExistProductCode($originalProductId, $languageId)
+    {
+        $program= ProductModel::all()
+            ->where('id', '=', $originalProductId)
+            ->where('language_id', '==', $languageId)->first();
+        return $program->code;
+    }
     public static function getOriginalProgram(): Collection
     {
         $language = LanguageModel::all()->where('code','=',Constant::LANGUAGE_DEFAULT)->first();
         return ProgramModel::all()
+            ->where('language_id', '=', $language->id)
+            ->pluck('name', 'id');
+    }
+    public static function getOriginalProduct(): Collection
+    {
+        $language = LanguageModel::all()->where('code','=',Constant::LANGUAGE_DEFAULT)->first();
+        return ProductModel::all()
             ->where('language_id', '=', $language->id)
             ->pluck('name', 'id');
     }

@@ -22,6 +22,11 @@ class ProductModel extends Model
         return $this->belongsTo(ZoneModel::class, 'zone_id');
     }
 
+    public function originalProduct(): BelongsTo
+    {
+        return $this->belongsTo(__CLASS__, 'original_product');
+    }
+
     protected $hidden = [
     ];
 

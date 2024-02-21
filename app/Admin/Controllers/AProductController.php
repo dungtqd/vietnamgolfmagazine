@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\CategoryModel;
 use App\Models\ProductModel;
+use App\Util\Constant;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -29,9 +30,9 @@ class AProductController extends AdminController
         $grid = new Grid(new ProductModel());
         $grid->column('language.name', __('Ngôn ngữ'));
         $grid->column('name', __('Tên ứng viên'))->filter('like');
+        $grid->column('code', __('Mã code'));
         $grid->column('description', __('Mô tả'))->textarea();
         $grid->column('image', __('Hình ảnh'))->image();
-        $grid->column('code', __('Mã code'));
         $grid->column('order', __('Sắp xếp'));
 //        $grid->column('location', __('Địa chỉ'));
 //        $grid->column('website', __('Website'));
@@ -85,18 +86,22 @@ class AProductController extends AdminController
      */
     protected function form()
     {
-        $programOptions = (new UtilsCommonHelper)->getAllPrograms();
-        $programOptions->prepend('Không có','0');
-        $programDefault = $programOptions->keys()->first();
-
         $languageOptions = (new UtilsCommonHelper)->getAllLanguages();
         $languageDefault = $languageOptions->keys()->first();
+//
+//        $provinceOptions = (new UtilsCommonHelper)->getAllProvinces();
+//        $provinceDefault = $provinceOptions->keys()->first();
+//
+//        $zoneOptions = (new UtilsCommonHelper)->getAllZones();
+//        $zoneDefault = $zoneOptions->keys()->first();
 
-        $provinceOptions = (new UtilsCommonHelper)->getAllProvinces();
-        $provinceDefault = $provinceOptions->keys()->first();
+        //ngôn ngữ default lúc tạo là tiếng Việt
+        $originalProductOptions = UtilsCommonHelper::getOriginalProduct();
+        $originalProductOptions->prepend('Không có', '0');
+        $originalProductDefault = $originalProductOptions->keys()->first();
 
-        $zoneOptions = (new UtilsCommonHelper)->getAllZones();
-        $zoneDefault = $zoneOptions->keys()->first();
+        $languageOptions = UtilsCommonHelper::getAllLanguages();
+        $languageDefault = $languageOptions->keys()->first();
 
 
         $form = new Form(new ProductModel());
@@ -108,12 +113,42 @@ class AProductController extends AdminController
 
 //            $form->select('zone_id', __('Vùng/miền'))->options($zoneOptions)->default($zoneId);
 //            $form->select('province_id', __('Tỉnh/thành phố'))->options($provinceOptions)->default($provinceId);
-            $form->text('code', __('Mã code'))->disable();
+
+            $languageId = $form->model()->find($id)->getOriginal("language_id");
+            $originalProductId = $form->model()->find($id)->getOriginal("original_product");
+
+            $form->select('language_id', __('Ngôn ngữ'))->disable()->value($languageId);
+            $form->select('original_product', __('Hạng mục gốc theo ngôn ngữ'))->disable()->value($originalProductId);
+
+            $form->text('code', __('Mã code'))->disable()->required();
         } else {
 //            $form->select('zone_id', __('Vùng/miền'))->options($zoneOptions)->required()->default($zoneDefault);
 //            $form->select('province_id', __('Tỉnh/thành phố'))->options($provinceOptions)->required()->default($provinceDefault);
             $form->select('language_id', __('Ngôn ngữ'))->options($languageOptions)->required()->default($languageDefault);
-            $form->text('code', __('Mã code'));
+            $form->select('original_product', __('Hạng mục gốc theo ngôn ngữ'))->options($originalProductOptions)->required()->default($originalProductDefault);
+
+            $form->hidden('code', __('Mã code'));
+
+            $form->saving(function ($form) {
+                $originalProductId = $form->original_product;
+                $intOriginalProductId= (int)$originalProductId;
+
+                $languageId = $form->language_id;
+                $intLanguageId= (int)$languageId;
+                $languageDefault = UtilsCommonHelper::getOriginalLanguage();
+                //check neu ngon ngu goc + original_product =0 thi tao ma code
+                if ($intLanguageId === $languageDefault && $intOriginalProductId === Constant::PARENT_ID_ROOT) {
+                    //tao moi ma code
+                    error_log("tao moi ma code");
+                    $form->code = UtilsCommonHelper::generateCode();
+                }else{
+                    //tim ma code cu
+                    $existCode=UtilsCommonHelper::getExistProductCode($originalProductId, $languageDefault);
+                    error_log("lay lai code cu");
+                    error_log($existCode);
+                    $form->code =$existCode;
+                }
+            });
         }
         $form->text('name', __('Tên ứng viên'))->required();
         $form->textarea('description', __('Mô tả'));
