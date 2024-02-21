@@ -8,6 +8,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Illuminate\Support\MessageBag;
 
 class AProgramProductController extends AdminController
 {
@@ -28,10 +29,12 @@ class AProgramProductController extends AdminController
         $grid = new Grid(new ProgramProductModel());
         $grid->column('program.name', __('Tên hạng mục'))->filter('like');
         $grid->column('product.name', __('Tên ứng viên'))->filter('like');
+//        $grid->column('programCode.name', __('Tên hạng mục'))->filter('like');
+//        $grid->column('productCode.name', __('Tên ứng viên'))->filter('like');
         $grid->column('order', __('Sắp xếp'));
 //        $grid->column('status', __('Trạng thái'));  //todo: thêm convert status
         $grid->column('status', __('Trạng thái'))->display(function ($status) {
-            return UtilsCommonHelper::statusFormatter($status, "Core",'Status', "grid");
+            return UtilsCommonHelper::statusFormatter($status, "Core", 'Status', "grid");
         });
         $grid->column('created_at', __('Ngày tạo'))->display(function ($createdAt) {
             return ConstantHelper::dateFormatter($createdAt);
@@ -58,7 +61,7 @@ class AProgramProductController extends AdminController
         $show->field('product.name', __('Tên ứng viên'));
         $show->field('order', __('Sắp xếp'));
         $show->field('status', __('Trạng thái'))->as(function ($status) {
-            return UtilsCommonHelper::statusFormatter($status, "Core", 'Status',null);
+            return UtilsCommonHelper::statusFormatter($status, "Core", 'Status', null);
         });
 
         $show->field('created_at', __('Ngày tạo'));
@@ -74,10 +77,12 @@ class AProgramProductController extends AdminController
      */
     protected function form()
     {
-        $programOptions = UtilsCommonHelper::getAllPrograms();
+//        $programOptions = UtilsCommonHelper::getAllPrograms();
+        $programOptions = UtilsCommonHelper::getOriginalProgramCode();
         $programDefault = $programOptions->keys()->first();
 
-        $productOptions = UtilsCommonHelper::getAllProducts();
+//        $productOptions = UtilsCommonHelper::getAllProducts();
+        $productOptions = UtilsCommonHelper::getOriginalProductCode();
         $productDefault = $productOptions->keys()->first();
 
         $statusOptions = UtilsCommonHelper::commonCode("Core", "Status", "description_vi", "value");
@@ -88,19 +93,51 @@ class AProgramProductController extends AdminController
             $id = request()->route()->parameter('program_product');
 
             $programId = $form->model()->find($id)->getOriginal("program_id");
-            $provinceId = $form->model()->find($id)->getOriginal("product_id");
+            $productId = $form->model()->find($id)->getOriginal("product_id");
+            $programCode = $form->model()->find($id)->getOriginal("program_code");
+            $productCode = $form->model()->find($id)->getOriginal("product_code");
 
-            $form->select('program_id', __('Tên hạng mục'))->options($programOptions)->default($programId);
-            $form->select('product_id', __('Tên ứng viên'))->options($productOptions)->default($provinceId);  //TODO: nghiên cứu dùng multiSelect
+
+            $form->select('program_code', __('Tên hạng mục'))->options($programOptions)->default($programCode);
+            $form->select('product_code', __('Tên ứng viên'))->options($productOptions)->default($productCode);
+            $form->hidden('program_id', __('Tên hạng mục'))->value($programId);
+            $form->hidden('product_id', __('Tên ứng viên')) - value($productId);
         } else {
-            $form->select('program_id', __('Tên hạng mục'))->options($programOptions)->required()->default($programDefault);
-            $form->select('product_id', __('Tên ứng viên'))->options($productOptions)->required()->default($productDefault);
+            $form->select('program_code', __('Tên hạng mục'))->options($programOptions)->required()->default($programDefault);
+            $form->select('product_code', __('Tên ứng viên'))->options($productOptions)->required()->default($productDefault);
+            $form->hidden('program_id', __('Tên hạng mục'));
+            $form->hidden('product_id', __('Tên ứng viên'));
+            $form->saving(function ($form) {
+                $programCode = $form->program_code;
+                $programId = UtilsCommonHelper::getOriginalProgramByCode($programCode);
+                $form->program_id = $programId;
+
+                $productCode = $form->product_code;
+                $productId = UtilsCommonHelper::getOriginalProductByCode($productCode);
+                $form->product_id = $productId;
+
+            });
         }
 
         $form->number('order', __('Sắp xếp'));
-//        $form->number('status', __('Trạng thái'));  //todo: thêm trạng thái từ bảng config
         $form->select('status', __('Trạng thái'))->options($statusOptions)->default($statusDefault)->required();
 
+        $form->saving(function ($form) {
+            $programCode = $form->program_code;
+            $productCode = $form->product_code;
+
+            $existProgramProduct = UtilsCommonHelper::getExistProgramProduct($programCode, $productCode);
+            error_log($existProgramProduct);
+            if ($existProgramProduct !== 0) {
+                $error = new MessageBag([
+                    'title' => 'Tạo dữ liệu lỗi',
+                    'message' => 'Hạng mục và ứng viên  đã tồn tại',
+                ]);
+
+                return back()->with(compact('error'));
+            }
+
+        });
 
         return $form;
     }

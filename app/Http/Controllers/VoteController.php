@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Admin\Controllers\UtilsCommonHelper;
 use App\Models\LanguageModel;
 use App\Models\VoteModel;
 use App\Traits\ResponseFormattingTrait;
@@ -43,21 +44,22 @@ class VoteController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validatedData = $request->validate([
-            'program_id' => 'required|integer',
-            'product_id' => 'required|integer',
+            'program_product_id' => 'required|integer',
             'language_id' => 'required|integer',
             'ip' => 'required|string|max:255',
             'agent' => 'required|string|max:255',
         ]);
 
-        $programId = $request->input('program_id');
-        $productId = $request->input('product_id');
+        $programProductId = $request->input('program_product_id');
         $languageId = $request->input('language_id');
         $ip = $request->input('ip');
 
-        //check program and product
-        $productAndProgram = $this->countValidProgramAndProduct($programId, $productId);
-        if ($productAndProgram === 0) {
+        //check program_product working or not
+        $existProductAndProgram=$this->isValidProgramProduct($programProductId);
+
+        $programProduct=UtilsCommonHelper::getProgramProductById($programProductId);
+
+        if (!$existProductAndProgram) {
             $response = $this->_formatBaseResponse(400, null, 'Tạo dữ liệu thất bại');
         } else {
             //check language
@@ -68,8 +70,9 @@ class VoteController extends Controller
                 //check trung ip
                 $existIP = DB::table('vote as vo')
                     ->select('vo.id')
-                    ->where('vo.program_id', '=', $programId)
-                    ->where('vo.product_id', '=', $productId)
+                    ->join('program_product as pp','vo.program_product_id','=','pp.id')
+                    ->where('vo.status', '=', Constant::VOTE_STATUS__VALID)
+                    ->where('pp.program_code', '=', $programProduct->program_code)
                     ->where('vo.ip', '=', $ip)
                     ->get();
                 error_log($existIP);
@@ -79,9 +82,11 @@ class VoteController extends Controller
                     $response = $this->_formatBaseResponse(400, null, 'Tạo dữ liệu thất bại do trùng IP');
                 } else {
                     $currentTimestamp = now()->timestamp;
+
                     $vote = VoteModel::create([
-                        'program_id' => $validatedData['program_id'],
-                        'product_id' => $validatedData['product_id'],
+                        'program_product_id' => $programProductId,
+                        'program_id' => $programProduct->program_id,
+                        'product_id' => $programProduct->product_id,
                         'language_id' => $validatedData['language_id'],
                         'ip' => $validatedData['ip'],
                         'agent' => $validatedData['agent'],
@@ -97,7 +102,6 @@ class VoteController extends Controller
                 }
 
             }
-
         }
         return response()->json($response);
     }
@@ -219,5 +223,17 @@ class VoteController extends Controller
             ->get();
         error_log($productAndProgram);
         return $productAndProgram->count();
+    }
+
+    private function isValidProgramProduct($programProductId): bool
+    {
+        $productAndProgram = DB::table('program_product as pp')
+            ->select('pp.id')
+            ->where('pp.id', '=', $programProductId)
+            ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
+            ->get();
+        $total=$productAndProgram->count();
+
+        return !($total === 0);
     }
 }

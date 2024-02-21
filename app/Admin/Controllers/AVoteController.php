@@ -27,7 +27,7 @@ class AVoteController extends AdminController
         $grid = new Grid(new VoteModel());
         $grid->column('program.name', __('Tên hạng mục'))->filter('like');
         $grid->column('product.name', __('Tên ứng viên'))->filter('like');
-        $grid->column('user_id', __('Người bình chọn'))->filter('like');  //TODO: sau lay tu bang user
+//        $grid->column('user_id', __('Người bình chọn'))->filter('like');  //TODO: sau lay tu bang user
         $grid->column('ip', __('Địa chỉ IP'));
         $grid->column('agent', __('Agent'));
         $grid->column('language.name', __('Ngôn ngữ'));
@@ -59,7 +59,7 @@ class AVoteController extends AdminController
         $show->field('language.name', __('Ngôn ngữ'));
         $show->field('program.name', __('Tên hạng mục'));
         $show->field('product.name', __('Tên ứng viên'));
-        $show->field('user_id', __('Người bình chọn'));  //TODO: sau lay tu bang user
+//        $show->field('user_id', __('Người bình chọn'));  //TODO: sau lay tu bang user
         $show->field('ip', __('Địa chỉ IP'));
         $show->field('agent', __('Agent'));
         $show->field('status', __('Trạng thái'));  //todo: thêm format status

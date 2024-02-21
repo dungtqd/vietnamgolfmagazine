@@ -9,6 +9,7 @@ use App\Models\LayoutModel;
 use App\Models\ModuleModel;
 use App\Models\ProductModel;
 use App\Models\ProgramModel;
+use App\Models\ProgramProductModel;
 use App\Models\ProvinceModel;
 use App\Models\VoteBannerModel;
 use App\Models\ZoneModel;
@@ -55,6 +56,16 @@ class UtilsCommonHelper
             ->where('language_id', '=', $language->id)
             ->pluck('name', 'id');
     }
+
+    public static function getOriginalProgramCode(): Collection
+    {
+        $language = LanguageModel::all()->where('code','=',Constant::LANGUAGE_DEFAULT)->first();
+
+        return ProgramModel::all()
+            ->where('parent_id', '!=',Constant::PARENT_ID_ROOT)
+            ->where('language_id', '=', $language->id)
+            ->pluck('name', 'code');
+    }
     public static function getOriginalProduct(): Collection
     {
         $language = LanguageModel::all()->where('code','=',Constant::LANGUAGE_DEFAULT)->first();
@@ -62,6 +73,47 @@ class UtilsCommonHelper
             ->where('language_id', '=', $language->id)
             ->pluck('name', 'id');
     }
+
+    public static function getOriginalProgramByCode($code): int
+    {
+        $language = LanguageModel::all()->where('code','=',Constant::LANGUAGE_DEFAULT)->first();
+        $program= ProgramModel::all()
+            ->where('code', '=', $code)->first();
+        return $program->id;
+    }
+
+    public static function getOriginalProductByCode($code): int
+    {
+        $language = LanguageModel::all()->where('code','=',Constant::LANGUAGE_DEFAULT)->first();
+        $product= ProductModel::all()
+            ->where('code', '=', $code)->first();
+        return $product->id;
+    }
+
+    public static function getOriginalProductCode(): Collection
+    {
+        $language = LanguageModel::all()->where('code','=',Constant::LANGUAGE_DEFAULT)->first();
+
+        return ProductModel::all()
+            ->where('original_product', '=',Constant::PARENT_ID_ROOT)
+            ->where('language_id', '=', $language->id)
+            ->pluck('name', 'code');
+    }
+
+    public static function getExistProgramProduct($programCode, $productCode): int
+    {
+        $programProduct= ProgramProductModel::all()
+            ->where('program_code', '=',$programCode)
+            ->where('product_code', '=', $productCode);
+        return $programProduct->count();
+    }
+
+    public static function getProgramProductById($programProductid)
+    {
+        return ProgramProductModel::all()
+            ->where('id', '=',$programProductid)->first();
+    }
+
     public static function getOriginalLanguage()
     {
         $language = LanguageModel::all()->where('code','=',Constant::LANGUAGE_DEFAULT)->first();
