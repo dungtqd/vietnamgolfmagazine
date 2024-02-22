@@ -44,20 +44,25 @@ class VoteController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validatedData = $request->validate([
-            'program_product_id' => 'required|integer',
+//            'program_product_id' => 'required|integer',
+            'program_code' => 'required|string',
+            'product_code' => 'required|string',
             'language_id' => 'required|integer',
             'ip' => 'required|string|max:255',
             'agent' => 'required|string|max:255',
         ]);
 
-        $programProductId = $request->input('program_product_id');
+//        $programProductId = $request->input('program_product_id');
+        $programCode = $request->input('program_code');
+        $productCode = $request->input('product_code');
         $languageId = $request->input('language_id');
         $ip = $request->input('ip');
 
         //check program_product working or not
-        $existProductAndProgram=$this->isValidProgramProduct($programProductId);
+        $existProductAndProgram=$this->isValidProgramProduct($programCode, $productCode);
 
-        $programProduct=UtilsCommonHelper::getProgramProductById($programProductId);
+//        $programProduct=UtilsCommonHelper::getProgramProductById($programProductId);
+        $programProduct=UtilsCommonHelper::getProgramProductByCode($programCode, $productCode);
 
         if (!$existProductAndProgram) {
             $response = $this->_formatBaseResponse(400, null, 'Tạo dữ liệu thất bại');
@@ -84,7 +89,7 @@ class VoteController extends Controller
                     $currentTimestamp = now()->timestamp;
 
                     $vote = VoteModel::create([
-                        'program_product_id' => $programProductId,
+                        'program_product_id' => $programProduct->id,
                         'program_id' => $programProduct->program_id,
                         'product_id' => $programProduct->product_id,
                         'language_id' => $validatedData['language_id'],
@@ -227,11 +232,14 @@ class VoteController extends Controller
         return $productAndProgram->count();
     }
 
-    private function isValidProgramProduct($programProductId): bool
+    private function isValidProgramProduct($programCode, $productCode): bool
     {
         $productAndProgram = DB::table('program_product as pp')
             ->select('pp.id')
-            ->where('pp.id', '=', $programProductId)
+            ->join('program as po', 'po.id' ,'=', 'pp.program_id')
+            ->join('product as pd', 'pd.id' ,'=', 'pp.product_id')
+            ->where('pp.program_code', '=', $programCode)
+            ->where('pp.product_code', '=', $productCode)
             ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
             ->get();
         $total=$productAndProgram->count();
