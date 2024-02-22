@@ -81,7 +81,7 @@ class AVoteBannerController extends AdminController
         }
         $form->text('name', __('Tên '))->required();
         $form->textarea('description', __('Mô tả'));
-        $form->text('order', __('Sắp xếp'));
+        $form->text('order', __('Sắp xếp'))->required();
 //        $form->text('code', __('Mã code'));
         $form->select('language_id', __('Ngôn ngữ'))->options($languageOptions)->required()->default($languageDefault);
 
