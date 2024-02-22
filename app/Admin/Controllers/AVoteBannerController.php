@@ -31,7 +31,8 @@ class AVoteBannerController extends AdminController
         $grid->column('name', __('Tên banner'))->filter('like');
         $grid->column('description', __('Mô tả'))->textarea();
         $grid->column('language.name', __('Ngôn ngữ'));
-        $grid->column('code', __('Mã code'));
+//        $grid->column('code', __('Mã code'));
+        $grid->column('order', __('Sắp xếp'));
         $grid->column('created_at', __('Ngày tạo'))->display(function ($createdAt) {
             return ConstantHelper::dateFormatter($createdAt);
         });
@@ -55,7 +56,8 @@ class AVoteBannerController extends AdminController
         $show = new Show(VoteBannerModel::findOrFail($id));
         $show->field('name', __('Tên banner'));
         $show->field('description', __('Mô tả'));
-        $show->field('code', __('Mã code'));
+        $show->field('order', __('Sắp xếp'));
+//        $show->field('code', __('Mã code'));
         $show->field('language.name', __('Ngôn ngữ'));
         $show->field('created_at', __('Ngày tạo'));
         $show->field('updated_at', __('Ngày cập nhật'));
@@ -79,7 +81,8 @@ class AVoteBannerController extends AdminController
         }
         $form->text('name', __('Tên '))->required();
         $form->textarea('description', __('Mô tả'));
-        $form->text('code', __('Mã code'));
+        $form->text('order', __('Sắp xếp'));
+//        $form->text('code', __('Mã code'));
         $form->select('language_id', __('Ngôn ngữ'))->options($languageOptions)->required()->default($languageDefault);
 
         return $form;
