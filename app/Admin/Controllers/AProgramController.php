@@ -113,12 +113,12 @@ class AProgramController extends AdminController
 
 //            $form->select('language_id', __('Ngôn ngữ'))->disable()->value($languageId);
             $form->select('parent_id', __('Hạng mục cha'))->options($programOptions)->default($parentId);
-            $form->select('original_program', __('Hạng mục gốc theo ngôn ngữ'))->disable()->value($originalProgramId);
+            $form->select('original_program', __('Hạng mục gốc theo tiếng Việt'))->disable()->value($originalProgramId);
             $form->text('code', __('Mã hạng mục'))->disable()->required();
         } else {
             $form->select('language_id', __('Ngôn ngữ'))->options($languageOptions)->required()->default($languageDefault);
             $form->select('parent_id', __('Hạng mục cha'))->options($programOptions)->required()->default($programDefault);
-            $form->select('original_program', __('Hạng mục gốc theo ngôn ngữ'))->options($originalProgramOptions)->required()->default($originalProgramDefault);
+            $form->select('original_program', __('Hạng mục gốc theo tiếng Việt'))->options($originalProgramOptions)->required()->default($originalProgramDefault);
             $form->hidden('code', __('Mã hạng mục'));
 
             $form->saving(function ($form) {

@@ -94,8 +94,8 @@ class AVoteBannerDetailController extends AdminController
             $form->select('banner_id', __('Banner'))->options($bannerOptions)->required()->default($bannerDefault);
             $form->select('language_id', __('Ngôn ngữ'))->options($languageOptions)->required()->default($languageDefault);
         }
-        $form->text('title', __('Tiêu đề'))->required();
-        $form->textarea('description', __('Mô tả'));
+        $form->ckeditor('title', __('Tiêu đề'))->required();
+        $form->ckeditor('description', __('Mô tả'));
         $form->text('link', __('Đường dẫn'));
         $form->image('desktop_image', __('Ảnh desktop'));
         $form->image('mobile_image', __('Ảnh mobile'));

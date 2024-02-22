@@ -33,7 +33,7 @@ class AProductController extends AdminController
         $grid->column('code', __('Mã code'));
         $grid->column('description', __('Mô tả'))->textarea();
         $grid->column('image', __('Hình ảnh'))->image();
-        $grid->column('order', __('Sắp xếp'));
+//        $grid->column('order', __('Sắp xếp'));
 //        $grid->column('location', __('Địa chỉ'));
 //        $grid->column('website', __('Website'));
 //        $grid->column('phone_number', __('Số điện thoại'));
@@ -65,7 +65,7 @@ class AProductController extends AdminController
         $show->field('description', __('Mô tả'));
         $show->field('image', __('Hình ảnh'))->image();
         $show->field('code', __('Mã code'));
-        $show->field('order', __('Order'));
+//        $show->field('order', __('Order'));
 //        $show->field('location', __('Địa chỉ'));
 //        $show->field('website', __('Website'));
 //        $show->field('phone_number', __('Số điện thoại'));
@@ -118,14 +118,14 @@ class AProductController extends AdminController
             $originalProductId = $form->model()->find($id)->getOriginal("original_product");
 
 //            $form->select('language_id', __('Ngôn ngữ'))->default($languageId)->disable();
-            $form->select('original_product', __('Hạng mục gốc theo ngôn ngữ'))->disable()->value($originalProductId);
+            $form->select('original_product', __('Hạng mục gốc theo tiếng Việt'))->disable()->value($originalProductId);
 
             $form->text('code', __('Mã code'))->disable()->required();
         } else {
 //            $form->select('zone_id', __('Vùng/miền'))->options($zoneOptions)->required()->default($zoneDefault);
 //            $form->select('province_id', __('Tỉnh/thành phố'))->options($provinceOptions)->required()->default($provinceDefault);
             $form->select('language_id', __('Ngôn ngữ'))->options($languageOptions)->required()->default($languageDefault);
-            $form->select('original_product', __('Hạng mục gốc theo ngôn ngữ'))->options($originalProductOptions)->required()->default($originalProductDefault);
+            $form->select('original_product', __('Hạng mục gốc theo tiếng Việt'))->options($originalProductOptions)->required()->default($originalProductDefault);
 
             $form->hidden('code', __('Mã code'));
 
@@ -153,7 +153,7 @@ class AProductController extends AdminController
         $form->text('name', __('Tên ứng viên'))->required();
         $form->textarea('description', __('Mô tả'));
         $form->image('image', __('Ảnh'));
-        $form->number('order', __('Order'));
+//        $form->number('order', __('Sắp xếp'));
 //        $form->text('location', __('Địa chỉ'));
 //        $form->text('website', __('Website'));
 //        $form->mobile('phone_number', __('Số điện thoại'));
