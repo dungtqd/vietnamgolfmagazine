@@ -39,7 +39,7 @@ class AVoteBannerController extends AdminController
         $grid->column('updated_at', __('Ngày cập nhật'))->display(function ($updatedAt) {
             return ConstantHelper::dateFormatter($updatedAt);
         });
-        $grid->model()->orderBy('created_at', 'desc');
+        $grid->model()->orderBy('order', 'asc');
         $grid->fixColumns(0, -1);
         $grid->disableFilter();
         return $grid;
