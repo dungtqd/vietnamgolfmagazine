@@ -98,12 +98,13 @@ class BannerController extends Controller
                 'vb.name as name',
                 'vb.description',
                 'vb.code',
+                'vb.order',
                 'vb.language_id',
                 'vb.created_at',
                 'vb.updated_at')
             ->join('language as la', 'la.id', '=', 'vb.language_id')
             ->where('vb.language_id', '=', $languageId)
-            ->orderBy('vb.updated_at', 'DESC')
+            ->orderBy('vb.order', 'ASC')
             ->get();
 
         $totalBanner = $rootBanner->count();
