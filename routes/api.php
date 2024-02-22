@@ -42,6 +42,8 @@ Route::post('/vote/count-by-program', 'VoteController@countVoteByProgram');
 Route::post('/vote/count-by-program-and-product', 'VoteController@countVoteByProgramAndProduct');
 //banner
 Route::get('/banner/get-root-banner/{languageId}', 'BannerController@getAll');
+//extension
+Route::get('/extension/all', 'ExtensionController@index');
 
 //***************Read****************************
 //category
