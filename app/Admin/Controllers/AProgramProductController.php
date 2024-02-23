@@ -111,8 +111,8 @@ class AProgramProductController extends AdminController
 
             $form->select('program_code', __('Tên hạng mục'))->options($programOptions)->default($programCode);
             $form->select('product_code', __('Tên ứng viên'))->options($productOptions)->default($productCode);
-            $form->hidden('program_id', __('Tên hạng mục'))->value($programId);
-            $form->hidden('product_id', __('Tên ứng viên')) - value($productId);
+//            $form->hidden('program_id', __('Tên hạng mục'))->value($programId);
+//            $form->hidden('product_id', __('Tên ứng viên')) - value($productId);
         } else {
             $form->select('program_code', __('Tên hạng mục'))->options($programOptions)->required()->default($programDefault);
             $form->select('product_code', __('Tên ứng viên'))->options($productOptions)->required()->default($productDefault);
