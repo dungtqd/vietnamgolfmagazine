@@ -29,8 +29,8 @@ class AProgramController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new ProgramModel());
-        $grid->column('language.name', __('Ngôn ngữ'));
-        $grid->column('parent.name', __('Hạng mục cha'));
+        $grid->column('language.name', __('Ngôn ngữ'))->filter('like');
+        $grid->column('parent.name', __('Hạng mục cha'))->filter('like');
         $grid->column('code', __('Mã hạng mục'));
         $grid->column('name', __('Tên hạng mục bình chọn'))->filter('like');
         $grid->column('description', __('Mô tả'))->textarea();
@@ -49,6 +49,7 @@ class AProgramController extends AdminController
         $grid->column('updated_at', __('Ngày cập nhật'))->display(function ($updatedAt) {
             return ConstantHelper::dateFormatter($updatedAt);
         });
+        $grid->model()->orderBy('language_id', 'asc');
         $grid->model()->orderBy('created_at', 'desc');
         $grid->fixColumns(0, -1);
         $grid->disableFilter();
@@ -91,7 +92,7 @@ class AProgramController extends AdminController
      */
     protected function form()
     {
-        $programOptions = UtilsCommonHelper::getAllPrograms();
+        $programOptions = UtilsCommonHelper::getAllRootPrograms();
         $programOptions->prepend('Không có', '0');
         $programDefault = $programOptions->keys()->first();
 
@@ -113,7 +114,7 @@ class AProgramController extends AdminController
 
 //            $form->select('language_id', __('Ngôn ngữ'))->disable()->value($languageId);
             $form->select('parent_id', __('Hạng mục cha'))->options($programOptions)->default($parentId);
-            $form->select('original_program', __('Hạng mục gốc theo tiếng Việt'))->disable()->value($originalProgramId);
+            $form->select('original_program', __('Hạng mục gốc theo tiếng Việt'))->options($originalProgramOptions)->default($originalProgramId)->disable()->value($originalProgramId);
             $form->text('code', __('Mã hạng mục'))->disable()->required();
         } else {
             $form->select('language_id', __('Ngôn ngữ'))->options($languageOptions)->required()->default($languageDefault);

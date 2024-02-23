@@ -33,6 +33,10 @@ class UtilsCommonHelper
     {
         return ProgramModel::all()->pluck('name', 'id');
     }
+    public static function getAllRootPrograms(): Collection
+    {
+        return ProgramModel::all()->where('parent_id','=',Constant::PARENT_ID_ROOT)->pluck('name', 'id');
+    }
 
     public static function getExistProgramCode($originalProgramId, $languageId)
     {
