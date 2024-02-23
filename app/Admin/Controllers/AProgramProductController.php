@@ -45,7 +45,7 @@ class AProgramProductController extends AdminController
         $grid->model()->orderBy('created_at', 'desc');
         $grid->fixColumns(0, -1);
 //        $grid->disableFilter();
-        $grid-> filter(function (Grid\Filter $filter) {
+        $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
             $languageOptions = UtilsCommonHelper::getAllLanguages();
             $productOptions = UtilsCommonHelper::getOriginalProductCode();
@@ -98,11 +98,11 @@ class AProgramProductController extends AdminController
 
         $statusOptions = UtilsCommonHelper::commonCode("Core", "Status", "description_vi", "value");
         $statusDefault = $statusOptions->keys()->first();
-
+        $programProductId = null;
         $form = new Form(new ProgramProductModel());
         if ($form->isEditing()) {
             $id = request()->route()->parameter('program_product');
-
+            $programProductId = $id;
             $programId = $form->model()->find($id)->getOriginal("program_id");
             $productId = $form->model()->find($id)->getOriginal("product_id");
             $programCode = $form->model()->find($id)->getOriginal("program_code");
@@ -133,13 +133,14 @@ class AProgramProductController extends AdminController
         $form->number('order', __('Sắp xếp'));
         $form->select('status', __('Trạng thái'))->options($statusOptions)->default($statusDefault)->required();
 
-        $form->saving(function ($form) {
+        $form->saving(function ($form) use ($programProductId) {
             $programCode = $form->program_code;
             $productCode = $form->product_code;
 
             $existProgramProduct = UtilsCommonHelper::getExistProgramProduct($programCode, $productCode);
+            error_log($programProductId);
             error_log($existProgramProduct);
-            if ($existProgramProduct !== 0) {
+            if ($existProgramProduct !== 0 && $programProductId === null) {
                 $error = new MessageBag([
                     'title' => 'Tạo dữ liệu lỗi',
                     'message' => 'Hạng mục và ứng viên  đã tồn tại',
