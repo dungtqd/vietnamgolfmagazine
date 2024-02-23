@@ -52,7 +52,19 @@ class AProgramController extends AdminController
         $grid->model()->orderBy('language_id', 'asc');
         $grid->model()->orderBy('created_at', 'desc');
         $grid->fixColumns(0, -1);
-        $grid->disableFilter();
+//        $grid->disableFilter();
+        $grid-> filter(function (Grid\Filter $filter) {
+            $filter->disableIdFilter();
+            $languageOptions = UtilsCommonHelper::getAllLanguages();
+            $programOptions = UtilsCommonHelper::getAllRootPrograms();
+            $programOptions->prepend('Không có', '0');
+            $filter->equal('language_id', 'Ngôn ngữ')->select($languageOptions);
+            $filter->equal('parent_id', 'Hạng mục cha')->select($programOptions);
+            $filter->like('name', 'Tên hạng mục bình chọn');
+            $filter->date('created_at', 'Ngày tạo');
+            $filter->date('updated_at', 'Ngày cập nhật');
+        });
+//        $grid->expandFilter();
         return $grid;
     }
 
@@ -108,11 +120,11 @@ class AProgramController extends AdminController
         if ($form->isEditing()) {
             $id = request()->route()->parameter('program');
             $parentId = $form->model()->find($id)->getOriginal("parent_id");
-//            $languageId = $form->model()->find($id)->getOriginal("language_id");
+            $languageId = $form->model()->find($id)->getOriginal("language_id");
 //            dd()
             $originalProgramId = $form->model()->find($id)->getOriginal("original_program");
 
-//            $form->select('language_id', __('Ngôn ngữ'))->disable()->value($languageId);
+//            $form->select('language_id', __('Ngôn ngữ'))->options($languageOptions)->default($languageId)->disable()->value($languageId);
             $form->select('parent_id', __('Hạng mục cha'))->options($programOptions)->default($parentId);
             $form->select('original_program', __('Hạng mục gốc theo tiếng Việt'))->options($originalProgramOptions)->default($originalProgramId)->disable()->value($originalProgramId);
             $form->text('code', __('Mã hạng mục'))->disable()->required();

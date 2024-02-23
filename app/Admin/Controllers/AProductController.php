@@ -30,6 +30,7 @@ class AProductController extends AdminController
         $grid = new Grid(new ProductModel());
         $grid->column('language.name', __('Ngôn ngữ'));
         $grid->column('name', __('Tên ứng viên'))->filter('like');
+        $grid->column('originalProduct.name', __('Ứng viên gốc theo tiếng Việt'))->filter('like');
         $grid->column('code', __('Mã code'));
         $grid->column('description', __('Mô tả'))->textarea();
         $grid->column('image', __('Hình ảnh'))->image();
@@ -46,9 +47,21 @@ class AProductController extends AdminController
         $grid->column('updated_at', __('Ngày cập nhật'))->display(function ($updatedAt) {
             return ConstantHelper::dateFormatter($updatedAt);
         });
+        $grid->model()->orderBy('language_id', 'asc');
         $grid->model()->orderBy('created_at', 'desc');
         $grid->fixColumns(0, -1);
-        $grid->disableFilter();
+//        $grid->disableFilter();
+        $grid-> filter(function (Grid\Filter $filter) {
+            $filter->disableIdFilter();
+            $languageOptions = UtilsCommonHelper::getAllLanguages();
+            $programOptions = UtilsCommonHelper::getOriginalProduct();
+            $programOptions->prepend('Không có', '0');
+            $filter->equal('language_id', 'Ngôn ngữ')->select($languageOptions);
+            $filter->equal('original_product', 'Ứng viên gốc theo tiếng Việt')->select($programOptions);
+            $filter->like('name', 'Tên hạng mục bình chọn');
+            $filter->date('created_at', 'Ngày tạo');
+            $filter->date('updated_at', 'Ngày cập nhật');
+        });
         return $grid;
     }
 
@@ -117,15 +130,20 @@ class AProductController extends AdminController
             $languageId = $form->model()->find($id)->getOriginal("language_id");
             $originalProductId = $form->model()->find($id)->getOriginal("original_product");
 
-//            $form->select('language_id', __('Ngôn ngữ'))->default($languageId)->disable();
-            $form->select('original_product', __('Hạng mục gốc theo tiếng Việt'))->disable()->value($originalProductId);
 
+//            $form->select('language_id', __('Ngôn ngữ'))->options($languageOptions)->default($languageId)->disable()->value($languageId);
+            $form->select('original_product', __('Ứng viên gốc theo tiếng Việt'))->options($originalProductOptions)->default($originalProductId)->disable()->value($originalProductId);
+            $form->saving(function ($form) {
+                $languageId = $form->language_id;
+                error_log($languageId);
+//                $form->language_id=$languageId;
+            });
             $form->text('code', __('Mã code'))->disable()->required();
         } else {
 //            $form->select('zone_id', __('Vùng/miền'))->options($zoneOptions)->required()->default($zoneDefault);
 //            $form->select('province_id', __('Tỉnh/thành phố'))->options($provinceOptions)->required()->default($provinceDefault);
             $form->select('language_id', __('Ngôn ngữ'))->options($languageOptions)->required()->default($languageDefault);
-            $form->select('original_product', __('Hạng mục gốc theo tiếng Việt'))->options($originalProductOptions)->required()->default($originalProductDefault);
+            $form->select('original_product', __('Ứng viên gốc theo tiếng Việt'))->options($originalProductOptions)->required()->default($originalProductDefault);
 
             $form->hidden('code', __('Mã code'));
 

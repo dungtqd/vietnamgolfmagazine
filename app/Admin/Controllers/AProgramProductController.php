@@ -44,7 +44,18 @@ class AProgramProductController extends AdminController
         });
         $grid->model()->orderBy('created_at', 'desc');
         $grid->fixColumns(0, -1);
-        $grid->disableFilter();
+//        $grid->disableFilter();
+        $grid-> filter(function (Grid\Filter $filter) {
+            $filter->disableIdFilter();
+            $languageOptions = UtilsCommonHelper::getAllLanguages();
+            $productOptions = UtilsCommonHelper::getOriginalProductCode();
+            $programOptions = UtilsCommonHelper::getOriginalProgramCode();
+//            $filter->equal('language_id', 'Ngôn ngữ')->select($languageOptions);
+            $filter->equal('program_code', 'Tên hạng mục')->select($programOptions);
+            $filter->equal('product_code', 'Tên ứng viên')->select($productOptions);
+            $filter->date('created_at', 'Ngày tạo');
+            $filter->date('updated_at', 'Ngày cập nhật');
+        });
         return $grid;
     }
 
