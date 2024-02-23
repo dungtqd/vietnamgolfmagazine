@@ -10,14 +10,14 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 
-class AContactController extends AdminController
+class AMembershipController extends AdminController
 {
     /**
      * Title for current resource.
      *
      * @var string
      */
-    protected $title = 'Quản lý email đăng ký';
+    protected $title = 'Quản lý thành viên';
 
     /**
      * Make a grid builder.
@@ -27,9 +27,8 @@ class AContactController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new ContactModel());
-        $grid->column('email', __('Email'))->filter('like');
+        $grid->column('phone_number', __('Số điện thooại'))->filter('like');
         $grid->column('subscribe_status', __('Trạng thái'))->display(function ($status) {
-            error_log($status);
             return UtilsCommonHelper::statusFormatter($status, "Read", 'Contact_Status', "grid");
         });
 
@@ -41,7 +40,7 @@ class AContactController extends AdminController
         });
         $grid->model()->orderBy('updated_at', 'desc');
         $grid->fixColumns(0, -1);
-        $grid->model()->where('type', '=', Constant::CONTACT_TYPE__SUBCRIBE);
+        $grid->model()->where('type', '=', Constant::CONTACT_TYPE__MEMBERSHIP);
         $grid->disableFilter();
 
         $grid->actions(function ($actions) {

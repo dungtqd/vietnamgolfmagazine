@@ -37,6 +37,7 @@ Route::group([
     $router->resource('/read-banner', AReadBannerController::class);
     $router->resource('/partner', APartnerController::class);
     $router->resource('/advertisement', AAdvertisementController::class);
+    $router->resource('/membership', AMembershipController::class);
 
     $router->resource('/common-code', ACommonCodeController::class);
 

@@ -44,6 +44,13 @@ class AVoteController extends AdminController
         $grid->model()->orderBy('created_at', 'desc');
         $grid->fixColumns(0, -1);
         $grid->disableFilter();
+        $grid->actions(function ($actions) {
+//            $blockDelete = $actions->row->block_delete;
+//            if ($blockDelete === 1) {
+            $actions->disableDelete();
+                $actions->disableEdit();
+//            }
+        });
         return $grid;
     }
 
@@ -62,7 +69,9 @@ class AVoteController extends AdminController
 //        $show->field('user_id', __('Người bình chọn'));  //TODO: sau lay tu bang user
         $show->field('ip', __('Địa chỉ IP'));
         $show->field('agent', __('Agent'));
-        $show->field('status', __('Trạng thái'));  //todo: thêm format status
+        $show->field('status', __('Trạng thái'))->as(function ($status) {
+            return UtilsCommonHelper::statusFormatter($status, "Vote", 'Vote_Status',null);
+        });
 
         $show->field('created_at', __('Ngày tạo'));
         $show->field('updated_at', __('Ngày cập nhật'));
