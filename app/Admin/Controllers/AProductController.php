@@ -58,7 +58,7 @@ class AProductController extends AdminController
             $programOptions->prepend('Không có', '0');
             $filter->equal('language_id', 'Ngôn ngữ')->select($languageOptions);
             $filter->equal('original_product', 'Ứng viên gốc theo tiếng Việt')->select($programOptions);
-            $filter->like('name', 'Tên hạng mục bình chọn');
+            $filter->like('name', 'Tên ứng viên');
             $filter->date('created_at', 'Ngày tạo');
             $filter->date('updated_at', 'Ngày cập nhật');
         });
