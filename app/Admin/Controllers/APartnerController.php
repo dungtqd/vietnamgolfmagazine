@@ -28,6 +28,7 @@ class APartnerController extends AdminController
         $grid = new Grid(new PartnerModel());
         $grid->column('name', __('Tên đối tác'));
         $grid->column('image', __('Hình ảnh'))->image();
+        $grid->column('url', __('URL'));
 
         $grid->column('created_at', __('Ngày tạo'))->display(function ($createdAt) {
             return ConstantHelper::dateFormatter($createdAt);
@@ -52,6 +53,7 @@ class APartnerController extends AdminController
         $show = new Show(PartnerModel::findOrFail($id));
         $show->field('name', __('Tên đối tác'));
         $show->field('image', __('Hình ảnh'))->image();
+        $show->field('url', __('URL'));
 
         $show->field('created_at', __('Ngày tạo'));
         $show->field('updated_at', __('Ngày cập nhật'));
@@ -71,6 +73,7 @@ class APartnerController extends AdminController
             $id = request()->route()->parameter('partner');
         }
         $form->text('name', __('Tên đối tác'))->required();
+        $form->text('url', __('URL'))->required();
         $form->image('image', __('Hình ảnh'));
 
         return $form;

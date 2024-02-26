@@ -204,7 +204,7 @@ class ProgramController extends Controller
             ->join('language as la', 'la.id', '=', 'p.language_id')
             ->where('p.parent_id', '=', $parentId)
             ->where('p.language_id', '=', $languageId)
-            ->orderBy('p.updated_at', 'DESC')
+            ->orderBy('p.name', 'ASC')
             ->get();
 
         $totalProgram = $childrenProgram->count();
@@ -216,6 +216,7 @@ class ProgramController extends Controller
             $rootProgramDto[] = new ProgramDto($childrenProgram, $totalVote);
         }
 
+        $collection = collect($rootProgramDto);
         $response = $this->_formatBaseResponseWithTotal(200, $rootProgramDto, $totalProgram, 'Lấy dữ liệu thành công');
 
         return response()->json($response);
