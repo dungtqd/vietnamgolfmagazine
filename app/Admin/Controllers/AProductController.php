@@ -34,6 +34,9 @@ class AProductController extends AdminController
         $grid->column('code', __('Mã code'));
         $grid->column('description', __('Mô tả'))->textarea();
         $grid->column('image', __('Hình ảnh'))->image();
+        $grid->column('image1', __('Hình ảnh 1'))->image();
+        $grid->column('image2', __('Hình ảnh 2'))->image();
+        $grid->column('image3', __('Hình ảnh 3'))->image();
 //        $grid->column('order', __('Sắp xếp'));
 //        $grid->column('location', __('Địa chỉ'));
 //        $grid->column('website', __('Website'));
@@ -77,6 +80,9 @@ class AProductController extends AdminController
         $show->field('name', __('Tên ứng viên'));
         $show->field('description', __('Mô tả'));
         $show->field('image', __('Hình ảnh'))->image();
+        $show->field('image1', __('Hình ảnh1'))->image();
+        $show->field('image2', __('Hình ảnh2'))->image();
+        $show->field('image3', __('Hình ảnh3'))->image();
         $show->field('code', __('Mã code'));
 //        $show->field('order', __('Order'));
 //        $show->field('location', __('Địa chỉ'));
@@ -99,7 +105,7 @@ class AProductController extends AdminController
      */
     protected function form()
     {
-        $languageOptions = (new UtilsCommonHelper)->getAllLanguages();
+        $languageOptions = UtilsCommonHelper::getAllLanguages();
         $languageDefault = $languageOptions->keys()->first();
 //
 //        $provinceOptions = (new UtilsCommonHelper)->getAllProvinces();
@@ -170,7 +176,10 @@ class AProductController extends AdminController
         }
         $form->text('name', __('Tên ứng viên'))->required();
         $form->textarea('description', __('Mô tả'));
-        $form->image('image', __('Ảnh'));
+        $form->image('image', __('Hình ảnh'));
+        $form->image('image1', __('Hình ảnh1'));
+        $form->image('image2', __('Hình ảnh2'));
+        $form->image('image3', __('Hình ảnh3'));
 //        $form->number('order', __('Sắp xếp'));
 //        $form->text('location', __('Địa chỉ'));
 //        $form->text('website', __('Website'));

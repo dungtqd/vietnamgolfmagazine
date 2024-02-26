@@ -18,6 +18,8 @@ return [
     'delete' => 'Xóa',
     'remove' => 'Xóa',
     'edit' => 'Sửa',
+    'Detail' => 'Chi tiết',
+    'Edit' => 'Chỉnh sửa',
     'view' => 'Xem',
     'continue_editing' => 'Tiếp tục chỉnh sửa',
     'continue_creating' => 'Tiếp tục tạo mới',

@@ -52,9 +52,6 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $alert = AlertModel::find($id);
-        $response = $this->_formatBaseResponse(200, $alert, 'Lấy dữ liệu thành công');
-        return response()->json($response);
     }
 
     /**
@@ -77,10 +74,6 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $alert = AlertModel::findOrFail($id);
-        $alert->update($request->all());
-        $response = $this->_formatBaseResponse(200, $alert, 'Cập nhật dữ liệu thành công');
-        return response()->json($response);
     }
 
     /**
@@ -91,15 +84,6 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        try {
-            $alert = AlertModel::findOrFail($id);
-            $alert->delete();
-        } catch (Exception $e) {
-            $response = $this->_formatBaseResponse(400, $e, "Xoá dữ liệu thất bại");
-            return response()->json($response);
-        }
-        $response = $this->_formatBaseResponse(204, $alert, 'Xoá dữ liệu thành công');
-        return response()->json($response);
     }
 
     public function getRankByProgram(Request $request): JsonResponse
@@ -110,7 +94,7 @@ class ProductController extends Controller
         ]);
 
 
-        $programCode= $request->input('programCode');
+        $programCode = $request->input('programCode');
         $languageId = $request->input('languageId');
 
         //get list children program
@@ -120,7 +104,10 @@ class ProductController extends Controller
                 'p.code',
                 'p.description',
                 'p.language_id',
-                'p.image')
+                'p.image',
+                'p.image1',
+                'p.image2',
+                'p.image3')
             ->join('program_product as pp', 'p.id', '=', 'pp.product_id')
 //            ->join('language as la', 'la.id', '=', 'p.language_id')
             ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
@@ -135,7 +122,7 @@ class ProductController extends Controller
         $rootProductDto = [];
         foreach ($childrenProduct as $childrenProduct) {
             //find program
-            $programProduct=UtilsCommonHelper::getProgramProductByCode($programCode, $childrenProduct->code);
+            $programProduct = UtilsCommonHelper::getProgramProductByCode($programCode, $childrenProduct->code);
 
             //count total vote
             $totalVote = $this->countVoteByProgramAndProduct($programProduct->id);
@@ -184,6 +171,10 @@ class ProductController extends Controller
                     'p.name',
                     'p.code',
                     'p.language_id',
+                    'p.image',
+                    'p.image1',
+                    'p.image2',
+                    'p.image3',
                     'p.description')
                 ->join('program_product as pp', 'p.id', '=', 'pp.product_id')
                 ->where('pp.program_code', '=', $programCode)
@@ -197,6 +188,10 @@ class ProductController extends Controller
                 ->select('p.id',
                     'p.name',
                     'p.language_id',
+                    'p.image',
+                    'p.image1',
+                    'p.image2',
+                    'p.image3',
                     'p.description')
                 ->join('program_product as pp', 'p.id', '=', 'pp.product_id')
                 ->where('pp.program_code', '=', $programCode)
@@ -232,6 +227,9 @@ class ProductController extends Controller
                 'p.name',
                 'p.code',
                 'p.image',
+                'p.image1',
+                'p.image2',
+                'p.image3',
                 'p.language_id',
                 'p.description')
             ->where('p.id', '=', $productId)
