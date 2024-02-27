@@ -180,7 +180,7 @@ class ProductController extends Controller
                 ->where('pp.program_code', '=', $programCode)
                 ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
                 ->where('p.language_id', '=', $languageId)
-                ->orderBy('p.name', 'ASC')
+                ->orderBy('pp.order', 'ASC')
                 ->limit($perPage)
                 ->get();
         } else {
@@ -198,7 +198,8 @@ class ProductController extends Controller
                 ->where('pp.status', '=', Constant::PROGRAM_PRODUCT_STATUS__ACTIVE)
                 ->where('p.name', 'like', '%' . $productName . '%')
                 ->where('p.language_id', '=', $languageId)
-                ->orderBy('p.name', 'ASC')
+                ->orderBy('pp.order', 'ASC')
+//                ->orderBy('p.name', 'ASC')
                 ->limit($perPage)
                 ->get();
         }
