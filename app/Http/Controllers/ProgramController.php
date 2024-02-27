@@ -114,7 +114,7 @@ class ProgramController extends Controller
             ->join('language as la', 'la.id', '=', 'p.language_id')
             ->where('p.parent_id', '=', Constant::PARENT_ID_ROOT)
             ->where('p.language_id', '=', $id)
-            ->orderBy('p.updated_at', 'DESC')
+            ->orderBy('p.order', 'ASC')
             ->get();
 
         $totalProgram = $rootProgram->count();
@@ -156,7 +156,7 @@ class ProgramController extends Controller
             ->where('p.parent_id', '=', Constant::PARENT_ID_ROOT)
             ->where('p.id', '=', $id)
             ->where('p.language_id', '=', $languageId)
-            ->orderBy('p.updated_at', 'DESC')
+            ->orderBy('p.order', 'ASC')
             ->get();
 
 
@@ -204,7 +204,7 @@ class ProgramController extends Controller
             ->join('language as la', 'la.id', '=', 'p.language_id')
             ->where('p.parent_id', '=', $parentId)
             ->where('p.language_id', '=', $languageId)
-            ->orderBy('p.name', 'ASC')
+            ->orderBy('p.order', 'ASC')
             ->get();
 
         $totalProgram = $childrenProgram->count();
@@ -247,7 +247,7 @@ class ProgramController extends Controller
             ->where('p.id', '=', $id)
             ->where('p.language_id', '=', $languageId)
             ->where('p.parent_id', '!=', Constant::PARENT_ID_ROOT)
-            ->orderBy('p.updated_at', 'DESC')
+            ->orderBy('p.order', 'ASC')
             ->get();
 
         $response = $this->_formatBaseResponse(200, $childProgram, 'Lấy dữ liệu thành công');
