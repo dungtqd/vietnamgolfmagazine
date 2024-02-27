@@ -41,6 +41,7 @@ class AProgramController extends AdminController
         $grid->column('seo_url', __('SEO URL'));
         $grid->column('meta_description', __('Meta description'));
         $grid->column('robots_tag', __('Robots tag'));
+        $grid->column('order', __('Sắp xếp'));
         $grid->column('start_date', __('Ngày bắt đầu'));
         $grid->column('end_date', __('Ngày kết thúc'));
         $grid->column('created_at', __('Ngày tạo'))->display(function ($createdAt) {
@@ -89,6 +90,7 @@ class AProgramController extends AdminController
         $show->field('seo_url', __('SEO URL'));
         $show->field('meta_description', __('Meta description'));
         $show->field('robots_tag', __('Robots tag'));
+        $show->field('order', __('Sắp xếp'));
         $show->field('start_date', __('Ngày bắt đầu'));
         $show->field('end_date', __('Ngày kết thúc'));
         $show->field('created_at', __('Ngày tạo'));
@@ -165,6 +167,7 @@ class AProgramController extends AdminController
         $form->text('seo_url', __('SEO URL'));
         $form->textarea('meta_description', __('Meta description'));
         $form->text('robots_tag', __('Robots tag'));
+        $form->number('order', __('Sắp xếp'))->required();
         $form->datetime('start_date', __('Ngày bắt đầu'))->required();
         $form->datetime('end_date', __('Ngày kết thúc'))->required();
 
